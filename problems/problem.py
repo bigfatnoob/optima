@@ -1,5 +1,8 @@
-from __future__ import division, print_function, absolute_import
-from ..utils import lib
+from __future__ import division, print_function
+import sys
+import os
+sys.path.append(os.path.abspath("utils/"))
+from lib import *
 
 """
 Default class which everything extends.
@@ -26,10 +29,10 @@ class Decision(O):
     i.high = high
 
   def norm(i, val):
-    return lib.norm(val, i.low, i.high)
+    return norm(val, i.low, i.high)
 
   def deNorm(i, val):
-    return lib.deNorm(val, i.low, i.high)
+    return deNorm(val, i.low, i.high)
 
 
 class Objective(O):

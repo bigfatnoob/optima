@@ -18,7 +18,7 @@ class ZDT1(Problem):
               f1(x) = x1 \n \
               f2(x) = g(x)(1 - (x1/g(x))**0.5 ) \n \
               where g(x) = 1 + 9*(sum_(i = 2 to n) x_i)/ n-1"
-    i.decisions = [Decision("x"+str(i+1),0,1) for i in range(30)]
+    i.decisions = [Decision("x"+str(index+1),0,1) for index in range(30)]
     i.objectives = [Objective("f1", True), Objective("f2", True)]
 
   def evaluate(i, decisions = None):
@@ -30,7 +30,3 @@ class ZDT1(Problem):
     i.objectives[0].value = decisions[0]
     i.objectives[1].value = g(1 - sqrt(decisions[0]/g))
     return [i.objectives[0].value, i.objectives[1].value]
-
-
-prob = ZDT1()
-print(prob.populate(50))
