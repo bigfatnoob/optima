@@ -3,6 +3,24 @@ from constants import EPS
 import random
 
 """
+Default class which everything extends.
+"""
+class O:
+  def __init__(i,**d): i.has().update(**d)
+  def has(i): return i.__dict__
+  def update(i,**d) : i.has().update(d); return i
+  def __repr__(i)   :
+    show=[':%s %s' % (k,i.has()[k])
+      for k in sorted(i.has().keys() )
+      if k[0] is not "#"]
+    txt = ' '.join(show)
+    if len(txt) > 60:
+      show=map(lambda x: '\t'+x+'\n',show)
+    return '{'+' '.join(show)+'}'
+  def __getitem__(i, item):
+    return i.has().get(item)
+
+"""
 Method to normalize value
 between 0 and 1
 """

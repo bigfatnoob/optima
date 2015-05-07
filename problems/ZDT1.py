@@ -30,3 +30,8 @@ class ZDT1(Problem):
     i.objectives[0].value = decisions[0]
     i.objectives[1].value = g(1 - sqrt(decisions[0]/g))
     return [i.objectives[0].value, i.objectives[1].value]
+
+
+o = ZDT1()
+o.populate(50)
+print(o.population[0])
