@@ -13,7 +13,7 @@ class ZDT1(Problem):
   def __init__(i):
     i.name = "ZDT1"
     i.desc = "No of Decisions = n = 30. \n \
-              Range of each imput = [0,1] \n \
+              Range of each input = [0,1] \n \
               Objectives: \n \
               f1(x) = x1 \n \
               f2(x) = g(x)(1 - (x1/g(x))**0.5 ) \n \
@@ -28,10 +28,5 @@ class ZDT1(Problem):
     decisions = [decision.value for decision in i.decisions]
     g  = 1 + 9 * sum(decisions[1:]) / (len(decisions)-1)
     i.objectives[0].value = decisions[0]
-    i.objectives[1].value = g(1 - sqrt(decisions[0]/g))
+    i.objectives[1].value = g * (1 - sqrt(decisions[0]/g))
     return [i.objectives[0].value, i.objectives[1].value]
-
-
-o = ZDT1()
-o.populate(50)
-print(o.population[0])
