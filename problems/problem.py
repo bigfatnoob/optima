@@ -80,8 +80,8 @@ class Problem(O):
   dominates other set of decisions ("two")
   """
   def dominates(i, one, two):
-    obj1 = i.evaluate(one)
-    obj2 = i.evaluate(two)
+    obj1 = one.objectives
+    obj2 = two.objectives
     atLeastOnce = False
     for index, (a, b) in enumerate(zip(obj1, obj2)):
       status = compare(a, b, i.objectives[index].toMinimize)
@@ -90,5 +90,4 @@ class Problem(O):
       elif status == 1:
         atLeastOnce = True
     return atLeastOnce
-
 

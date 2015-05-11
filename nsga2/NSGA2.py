@@ -2,7 +2,7 @@ import sys
 import os
 sys.path.append(os.path.abspath("."))
 from utils.lib import *
-from problems.zdt1 import ZDT1
+from problems.ZDT1 import ZDT1
 
 def settings():
   return O(
@@ -18,35 +18,38 @@ def loo(points):
 
 
 class Point(O):
-  def __init__(i, decisions):
-    i.decisions = decisions
-    i.rank = 0
-    i.dominated = []
-    i.dominating = 0
+  def __init__(self, decisions, problem):
+    self.decisions = decisions
+    self.rank = 0
+    self.dominated = []
+    self.dominating = 0
+    self.objectives = problem.evaluate(decisions)
+    self.crowd_dist = 0
+
 
 
 
 class NSGA2(O):
-  def __init__(i, problem):
-    i.problem = problem
-    i.frontiers = []
+  def __init__(self, problem):
+    self.problem = problem
+    self.frontiers = []
 
   """
   Fast Non Dominated Sort
   :param - Population to sort
   :return - List of Frontiers
   """
-  def fndSort(i, population = None):
+  def fast_non_dom_sort(self, population = None):
     frontiers = []
     front1 = []
-    if population == None:
-      population = i.problem.population
-    points = [Point(one) for one in population]
+    if population is None:
+      population = self.problem.population
+    points = [Point(one, self.problem) for one in population]
     for one, rest in loo(points):
       for two in rest:
-        if i.problem.dominates(one.decisions, two.decisions):
+        if self.problem.dominates(one, two):
           one.dominated.append(two)
-        elif i.problem.dominates(two.decisions, one.decisions):
+        elif self.problem.dominates(two, one):
           one.dominating += 1
       if one.dominating == 0:
         one.rank = 1
@@ -69,10 +72,25 @@ class NSGA2(O):
         front1 = front2
     return frontiers
 
+  def assign_crowd_dist(self, frontier):
+    l = len(frontier)
+    for m in range(len(self.problem.objectives)):
+      frontier = sorted(frontier, key=lambda x:x.objectives[m])
+      obj_min = frontier[0].objectives[m]
+      obj_max = frontier[-1].objectives[m]
+      frontier[0].crowd_dist = float("inf")
+      frontier[-1].crowd_dist = float("inf")
+      for i in range(1,len(frontier)-1):
+        frontier[i].crowd_dist += (frontier[i+1].objectives[m] - frontier[i-1].objectives[m])/(obj_max - obj_min)
+
+
+
+
 random.seed(2)
 o = ZDT1()
 o.populate(50)
 nsga2 = NSGA2(o)
-fronts = nsga2.fndSort()
-for front in fronts:
-  print(len(front))
+fronts = nsga2.fast_non_dom_sort()
+# for front in fronts:
+#   print(len(front))
+nsga2.assign_crowd_dist(fronts[0])
