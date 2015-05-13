@@ -42,28 +42,38 @@ class Objective(O):
 
 
 class Problem(O):
-  def __init__(i):
-    i.name = ""
-    i.desc = ""
-    i.decisions = []
-    i.objectives = []
-    i.evals = 0
-    i.population = []
+  def __init__(self):
+    self.name = ""
+    self.desc = ""
+    self.decisions = []
+    self.objectives = []
+    self.evals = 0
+    self.population = []
+    self.ideal_decisions = None
 
-  def generate(i):
-    return [uniform(d.low, d.high) for d in i.decisions]
+  def generate(self):
+    return [uniform(d.low, d.high) for d in self.decisions]
 
-  def assign(i, decisions):
-    for index, d in enumerate(i.decisions):
-      d.value = decisions[index]
+  def assign(self, decisions):
+    for i, d in enumerate(self.decisions):
+      d.value = decisions[i]
 
-  def populate(i, n):
-    i.population = []
+  def populate(self, n):
+    self.population = []
     for _ in range(n):
-      i.population.append(i.generate())
-    return i.population
+      self.population.append(self.generate())
+    return self.population
 
-  def evaluate(i, decisions=None):
+  def evaluate(self, decisions=None):
+    pass
+
+  def get_ideal_decisions(self, count = 500):
+    pass
+
+  def dist(self, one, two):
+    pass
+
+  def norm(self, one):
     pass
 
   """
@@ -90,4 +100,3 @@ class Problem(O):
       elif status == 1:
         atLeastOnce = True
     return atLeastOnce
-

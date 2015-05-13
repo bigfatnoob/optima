@@ -1,6 +1,7 @@
 from __future__ import division, print_function
 from constants import EPS
 import random
+import sys
 
 """
 Default class which everything extends.
@@ -49,3 +50,12 @@ def uniform(low, high):
   return random.uniform(low, high)
 
 
+def get_betaq(rand, alpha, eta=30):
+  if rand <= (1.0/alpha):
+      return (rand * alpha) ** (1.0/(eta+1.0))
+  else:
+      return (1.0/(2.0 - rand*alpha)) ** (1.0/(eta+1.0))
+
+def say(*lst):
+  print(*lst, end="")
+  sys.stdout.flush()

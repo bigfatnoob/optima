@@ -1,3 +1,4 @@
+from __future__ import print_function, division
 from problem import *
 from math import sqrt
 
@@ -20,6 +21,8 @@ class ZDT1(Problem):
               where g(x) = 1 + 9*(sum_(i = 2 to n) x_i)/ n-1"
     i.decisions = [Decision("x"+str(index+1),0,1) for index in range(30)]
     i.objectives = [Objective("f1", True), Objective("f2", True)]
+    i.evals = 0
+    i.ideal_decisions = None
 
   def evaluate(i, decisions = None):
     if decisions:
@@ -30,3 +33,15 @@ class ZDT1(Problem):
     i.objectives[0].value = decisions[0]
     i.objectives[1].value = g * (1 - sqrt(decisions[0]/g))
     return [i.objectives[0].value, i.objectives[1].value]
+
+  def get_ideal_decisions(self, count = 500):
+    if self.ideal_decisions is not None and len(self.ideal_decisions) == count:
+      return self.ideal_decisions
+    start = 1/(2*500)
+    delta = 1/500
+    self.ideal_decisions = []
+    for i in range(count):
+      self.ideal_decisions.append([start + i*delta]+[0]*29)
+    return self.ideal_decisions
+
+  def norm(self, one):
