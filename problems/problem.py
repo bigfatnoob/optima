@@ -40,6 +40,8 @@ class Objective(O):
     i.high = high
     i.value = None
 
+  def norm(i, val):
+    return norm(val, i.low, i.high)
 
 class Problem(O):
   def __init__(self):

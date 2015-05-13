@@ -5,6 +5,7 @@ sys.path.append(os.path.abspath("."))
 from utils.lib import *
 from problems.ZDT1 import ZDT1
 from copy import copy
+import numpy as np
 
 def settings():
   return O(
@@ -38,8 +39,12 @@ class NSGA2(O):
   def __init__(self, problem, max_eval = 250):
     self.problem = problem
     self.frontiers = []
-    self.max_eval = 250
+    self.max_eval = settings().max_iter
 
+  """
+  Runner method that generates the best
+  possible solutions using nsga2.
+  """
   def generate(self):
     P = copy(self.problem.population)
     pop_size = len(P)
@@ -58,7 +63,7 @@ class NSGA2(O):
       P = [point.decisions for point in P_next]
       self.problem.evals += 1
     print("")
-    return P_next
+    return P_next, fronts[:i]
 
 
   def make_kids(self, population):
@@ -211,28 +216,39 @@ class NSGA2(O):
   """
   def convergence(self, obtained):
     problem = self.problem
-    ideals = problem.get_ideal_decisions()
-    predicts = [o.decisions for o in obtained]
+    # ideals = problem.get_ideal_decisions()
+    # predicts = [o.decisions for o in obtained]
+    ideals = problem.get_ideal_objectives()
+    predicts = [o.objectives for o in obtained]
     gammas = []
     for predict in predicts:
+      gammas.append(min([problem.dist(predict, ideal) for ideal in ideals]))
+    return np.mean(gammas), np.var(gammas)
 
+  """
+  Calculate the diversity of the spread for a
+  set of solutions
+  """
+  def diversity(self, obtained):
+    def closest(one, many):
+      min_dist = sys.maxint
+      closest_point = None
+      for this in many:
+        dist = self.problem.dist(this, one)
+        if dist < min_dist:
+          min_dist = dist
+          closest_point = this
+      return min_dist, closest_point
 
-
-random.seed(2)
-o = ZDT1()
-o.populate(50)
-print(o.get_ideal_decisions()[0:2])
-#nsga2 = NSGA2(o)
-#goods = nsga2.generate()
-#for good in goods:
-#  print(good.decisions)
-#print(len(nsga2.make_kids(nsga2.problem.population)))
-#fronts = nsga2.fast_non_dom_sort()
-# for front in fronts:
-#   print(len(front))
-#frontier = nsga2.assign_crowd_dist(fronts[0])
-#for point in frontier:
-#  print(point.crowd_dist)
-#bro,sis = nsga2.sbx_crossover(fronts[0][0].decisions, fronts[0][1].decisions)
-#print(nsga2.poly_mutate(bro))
-
+    problem = self.problem
+    ideals = problem.get_ideal_objectives()
+    predicts = [o.objectives for o in obtained]
+    d_f = closest(ideals[0], predicts)[0]
+    d_l = closest(ideals[-1], predicts)[0]
+    distances = []
+    for i in range(len(predicts)-1):
+      distances.append(problem.dist(predicts[i], predicts[i+1]))
+    d_bar = np.mean(distances)
+    d_sum = sum([abs(d_i - d_bar) for d_i in distances])
+    delta = (d_f + d_l + d_sum) / (d_f + d_l + (len(predicts) - 1)*d_bar)
+    return delta
