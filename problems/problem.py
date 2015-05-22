@@ -52,8 +52,10 @@ class Problem(O):
     self.evals = 0
     self.population = []
     self.ideal_decisions = None
+    self.constraints = []
 
   def generate(self):
+    # TODO handle constraints here
     return [uniform(d.low, d.high) for d in self.decisions]
 
   def assign(self, decisions):
@@ -76,6 +78,9 @@ class Problem(O):
     pass
 
   def norm(self, one):
+    pass
+
+  def evaluateConstraints(self, one):
     pass
 
   """

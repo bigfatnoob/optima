@@ -63,6 +63,8 @@ class ZDT1(Problem):
   def dist(self, one, two):
     one_norm = self.norm(one)
     two_norm = self.norm(two)
+    #one_norm = one
+    #two_norm = two
     delta = 0
     count = 0
     for i,j in zip(one_norm, two_norm):
