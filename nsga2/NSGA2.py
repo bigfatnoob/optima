@@ -92,9 +92,9 @@ class NSGA2(O):
     points = [Point(one, self.problem) for one in population]
     for one, rest in loo(points):
       for two in rest:
-        if self.problem.dominates(one, two):
+        if self.problem.dominates(one, two) == 1:
           one.dominated.append(two)
-        elif self.problem.dominates(two, one):
+        elif self.problem.dominates(two, one) == 2:
           one.dominating += 1
       if one.dominating == 0:
         one.rank = 1

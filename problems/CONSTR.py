@@ -27,6 +27,7 @@ class CONSTR(Problem):
                   g1(x) = - x2 + 9*x1 >= 1"
     self.decisions = [Decision("x1",0.1,1), Decision("x2",0,5)]
     self.objectives = [Objective("f1",0.1,1), Decision("f2",0,5)]
+    self.constraints = [Constraint("g1"), Constraint("g2")]
     self.evals = 0
     self.ideal_decisions = None
     self.ideal_objectives = None
