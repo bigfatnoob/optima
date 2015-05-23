@@ -111,16 +111,8 @@ class Problem(O):
   def dominates(i, one, two):
     obj1 = one.objectives
     obj2 = two.objectives
-    atLeastOnce = False
     one_at_least_once = False
     two_at_least_once = False
-    # for index, (a, b) in enumerate(zip(obj1, obj2)):
-    #   status = compare(a, b, i.objectives[index].toMinimize)
-    #   if status == -1:
-    #     return False
-    #   elif status == 1:
-    #     atLeastOnce = True
-    # return atLeastOnce
     for index, (a, b) in enumerate(zip(obj1, obj2)):
       status = compare(a, b, i.objectives[index].toMinimize)
       if status == -1:
