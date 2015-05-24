@@ -45,13 +45,15 @@ class ZDT1(Problem):
       self.ideal_decisions.append([start + i*delta]+[0]*29)
     return self.ideal_decisions
 
-  def get_ideal_objectives(self):
+  def get_ideal_objectives(self, count=500):
     if self.ideal_objectives is not None:
       return self.ideal_objectives
-    ideal_decisions = self.get_ideal_decisions()
+    one_start = 1/(2*500)
+    two_start = 1- (1/(2*500))
+    delta = 1/500
     self.ideal_objectives = []
-    for decision in ideal_decisions:
-      self.ideal_objectives.append(self.evaluate(decision))
+    for i in range(count):
+      self.ideal_objectives.append([one_start+i*delta, two_start-i*delta])
     return self.ideal_objectives
 
   def norm(self, one):
@@ -63,8 +65,6 @@ class ZDT1(Problem):
   def dist(self, one, two):
     one_norm = self.norm(one)
     two_norm = self.norm(two)
-    #one_norm = one
-    #two_norm = two
     delta = 0
     count = 0
     for i,j in zip(one_norm, two_norm):

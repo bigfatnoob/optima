@@ -93,7 +93,7 @@ class NSGA2(O):
     for one, rest in loo(points):
       for two in rest:
         domination_status = self.problem.dominates(one, two)
-        if  domination_status == 1:
+        if domination_status == 1:
           one.dominated.append(two)
         elif domination_status == 2:
           one.dominating += 1

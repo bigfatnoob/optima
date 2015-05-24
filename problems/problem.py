@@ -47,6 +47,7 @@ class Objective(O):
 class Constraint(O):
   def __init__(self, name):
     self.name = name
+    self.value = None
     self.status = False
 
 
@@ -87,8 +88,29 @@ class Problem(O):
   def norm(self, one):
     pass
 
-  def evaluateConstraints(self, one):
-    pass
+  def evaluate_constraints(self, one):
+    return False, 0
+
+  def dominates(self, one, two):
+    one_status, one_offset = self.evaluate_constraints(one)
+    two_status, two_offset = self.evaluate_constraints(two)
+    better = self.better(one, two)
+    if not one_status and not two_offset:
+      # Return the better solution if both solutions satisfy the constraints
+      return better
+    elif not one_status:
+      # Return 1, if 1 satisfies the constraints
+      return 1
+    elif not two_status:
+      #Return 2, if 2 satisfies the constraints
+      return 2
+    # both fail the constraints
+    elif one_offset < two_offset:
+      # one has a lesser offset deviation
+      return 1
+    else:
+      # two has a lesser offset deviation
+      return 2
 
   """
   Domination is defined as follows:
@@ -104,17 +126,18 @@ class Problem(O):
   dominates other set of decisions ("two")
 
   Returns:
-    0 - one and two do not dominate each other
-    1 - one dominates two
-    2 - two dominates one
+    0 - one and two are not better each other
+    1 - one better than two
+    2 - two better than one
   """
-  def dominates(i, one, two):
+  def better(self, one, two):
+    #TODO evaluate better function
     obj1 = one.objectives
     obj2 = two.objectives
     one_at_least_once = False
     two_at_least_once = False
     for index, (a, b) in enumerate(zip(obj1, obj2)):
-      status = compare(a, b, i.objectives[index].toMinimize)
+      status = compare(a, b, self.objectives[index].toMinimize)
       if status == -1:
         #obj2[i] better than obj1[i]
         two_at_least_once = True
