@@ -83,6 +83,7 @@ if __name__ == "__main__":
   goods, fronts = nsga2.generate()
   print(nsga2.convergence(goods))
   print(nsga2.diversity(fronts[0]))
+  nsga2.solution_range(goods)
   # print(goods[0].decisions)
   # print(o.norm(goods[0].decisions))
   # print(goods[1].decisions)

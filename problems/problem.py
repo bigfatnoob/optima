@@ -63,8 +63,11 @@ class Problem(O):
     self.constraints = []
 
   def generate(self):
-    # TODO handle constraints here
-    return [uniform(d.low, d.high) for d in self.decisions]
+    while True:
+      one = [uniform(d.low, d.high) for d in self.decisions]
+      status = self.evaluate_constraints(one)[0]
+      if not status:
+        return one
 
   def assign(self, decisions):
     for i, d in enumerate(self.decisions):

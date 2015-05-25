@@ -39,7 +39,7 @@ class NSGA2(O):
   def __init__(self, problem, max_eval = 250):
     self.problem = problem
     self.frontiers = []
-    self.max_eval = settings().max_iter
+    self.max_eval = max_eval
 
   """
   Runner method that generates the best
@@ -226,6 +226,18 @@ class NSGA2(O):
       gammas.append(min([problem.dist(predict, ideal) for ideal in ideals]))
     return np.mean(gammas), np.var(gammas)
 
+  def solution_range(self, obtained):
+    predicts = [o.objectives for o in obtained]
+    maxs = [-sys.maxint]*len(predicts[0])
+    mins = [sys.maxint]*len(predicts[0])
+    for predict in predicts:
+      for i in range(len(predict)):
+        if predict[i] < mins[i]:
+          mins[i] = predict[i]
+        if predict[i] > maxs[i]:
+          maxs[i] = predict[i]
+    print("Mins = ", mins)
+    print("Maxs = ", maxs)
   """
   Calculate the diversity of the spread for a
   set of solutions
