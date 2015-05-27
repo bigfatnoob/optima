@@ -217,8 +217,6 @@ class NSGA2(O):
   """
   def convergence(self, obtained):
     problem = self.problem
-    # ideals = problem.get_ideal_decisions()
-    # predicts = [o.decisions for o in obtained]
     ideals = problem.get_ideal_objectives()
     predicts = [o.objectives for o in obtained]
     gammas = []
@@ -226,18 +224,20 @@ class NSGA2(O):
       gammas.append(min([problem.dist(predict, ideal) for ideal in ideals]))
     return np.mean(gammas), np.var(gammas)
 
+  """
+  Calculate the range for each objective
+  """
   def solution_range(self, obtained):
     predicts = [o.objectives for o in obtained]
-    maxs = [-sys.maxint]*len(predicts[0])
-    mins = [sys.maxint]*len(predicts[0])
+    solutions = [N() for _ in range(len(predicts[0]))]
     for predict in predicts:
       for i in range(len(predict)):
-        if predict[i] < mins[i]:
-          mins[i] = predict[i]
-        if predict[i] > maxs[i]:
-          maxs[i] = predict[i]
-    print("Mins = ", mins)
-    print("Maxs = ", maxs)
+        solutions[i] += predict[i]
+    for i, solution in enumerate(solutions):
+      print("Objective :",i,
+            "   Max = ", solutions[i].cache.has().hi,
+            "   Min = ", solutions[i].cache.has().lo)
+
   """
   Calculate the diversity of the spread for a
   set of solutions
