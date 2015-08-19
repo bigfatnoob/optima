@@ -68,5 +68,7 @@ if __name__ == "__main__":
   o.populate(optimizer.settings().pop_size)
   nsga2 = optimizer.NSGA2(o, 500)
   goods, fronts = nsga2.generate()
+  print(nsga2.convergence(goods))
+  print(nsga2.diversity(fronts[0]))
   nsga2.solution_range(goods)
 

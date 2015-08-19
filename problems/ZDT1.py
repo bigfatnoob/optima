@@ -1,6 +1,7 @@
 from __future__ import print_function, division
 from problem import *
 from math import sqrt
+import numpy as np
 
 """
 No of Decisions = n = 30.
@@ -12,6 +13,7 @@ Objectives:
 """
 class ZDT1(Problem):
   def __init__(i):
+    Problem.__init__(i)
     i.name = "ZDT1"
     i.desc = "No of Decisions = n = 30. \n \
               Range of each input = [0,1] \n \
@@ -77,26 +79,14 @@ if __name__ == "__main__":
   import nsga2.NSGA2 as optimizer
   import random
   random.seed(1)
-  o = ZDT1()
-  o.populate(optimizer.settings().pop_size)
-  nsga2 = optimizer.NSGA2(o)
-  goods, fronts = nsga2.generate()
-  print(nsga2.convergence(goods))
-  print(nsga2.diversity(fronts[0]))
-  nsga2.solution_range(goods)
-  # print(goods[0].decisions)
-  # print(o.norm(goods[0].decisions))
-  # print(goods[1].decisions)
-  # print(o.norm(goods[1].decisions))
-  # print(o.dist(goods[0].decisions, goods[1].decisions))
-  #for good in goods:
-  #  print(good.decisions)
-  #print(len(nsga2.make_kids(nsga2.problem.population)))
-  #fronts = nsga2.fast_non_dom_sort()
-  # for front in fronts:
-  #   print(len(front))
-  #frontier = nsga2.assign_crowd_dist(fronts[0])
-  #for point in frontier:
-  #  print(point.crowd_dist)
-  #bro,sis = nsga2.sbx_crossover(fronts[0][0].decisions, fronts[0][1].decisions)
-  #print(nsga2.poly_mutate(bro))
+  gammas,deltas = [], []
+  for _ in range(10):
+    o = ZDT1()
+    o.populate(optimizer.settings().pop_size)
+    nsga2 = optimizer.NSGA2(o)
+    goods, fronts = nsga2.generate()
+    gammas.append(nsga2.convergence(goods))
+    deltas.append(nsga2.diversity(fronts[0]))
+    nsga2.solution_range(goods)
+  print(np.mean(gammas), np.var(gammas))
+  print(np.mean(deltas), np.var(deltas))

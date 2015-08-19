@@ -3,7 +3,6 @@ import sys
 import os
 sys.path.append(os.path.abspath("."))
 from utils.lib import *
-from problems.ZDT1 import ZDT1
 from copy import copy
 import numpy as np
 
@@ -217,26 +216,28 @@ class NSGA2(O):
   """
   def convergence(self, obtained):
     problem = self.problem
+    if problem.constraints:
+      return
     ideals = problem.get_ideal_objectives()
     predicts = [o.objectives for o in obtained]
     gammas = []
     for predict in predicts:
       gammas.append(min([problem.dist(predict, ideal) for ideal in ideals]))
-    return np.mean(gammas), np.var(gammas)
+    return np.mean(gammas)
 
   """
   Calculate the range for each objective
   """
   def solution_range(self, obtained):
     predicts = [o.objectives for o in obtained]
-    solutions = [N() for _ in range(len(predicts[0]))]
+    solutions = [[] for _ in range(len(predicts[0]))]
     for predict in predicts:
       for i in range(len(predict)):
-        solutions[i] += predict[i]
+        solutions[i].append(predict[i])
     for i, solution in enumerate(solutions):
       print("Objective :",i,
-            "   Max = ", solutions[i].cache.has().hi,
-            "   Min = ", solutions[i].cache.has().lo)
+            "   Max = ", max(solutions[i]),
+            "   Min = ", min(solutions[i]))
 
   """
   Calculate the diversity of the spread for a
