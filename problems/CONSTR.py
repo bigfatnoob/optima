@@ -15,6 +15,7 @@ Constraints:
 """
 class CONSTR(Problem):
   def __init__(self):
+    Problem.__init__(self)
     self.name = "CONSTR"
     self.desc = "No of Decisions = n = 2. \
                 x1 = [0.1,1] \

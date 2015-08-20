@@ -12,30 +12,30 @@ Objectives:
   where g(x) = 1 + 9*(sum_(i = 2 to n) x_i)/ n-1
 """
 class ZDT1(Problem):
-  def __init__(i):
-    Problem.__init__(i)
-    i.name = "ZDT1"
-    i.desc = "No of Decisions = n = 30. \n \
+  def __init__(self):
+    Problem.__init__(self)
+    self.name = "ZDT1"
+    self.desc = "No of Decisions = n = 30. \n \
               Range of each input = [0,1] \n \
               Objectives: \n \
               f1(x) = x1 \n \
               f2(x) = g(x)(1 - (x1/g(x))**0.5 ) \n \
               where g(x) = 1 + 9*(sum_(i = 2 to n) x_i)/ n-1"
-    i.decisions = [Decision("x"+str(index+1),0,1) for index in range(30)]
-    i.objectives = [Objective("f1", True, 0, 1), Objective("f2", True, 0, 1)]
-    i.evals = 0
-    i.ideal_decisions = None
-    i.ideal_objectives = None
+    self.decisions = [Decision("x"+str(index+1),0,1) for index in range(30)]
+    self.objectives = [Objective("f1", True, 0, 1), Objective("f2", True, 0, 1)]
+    self.evals = 0
+    self.ideal_decisions = None
+    self.ideal_objectives = None
 
-  def evaluate(i, decisions = None):
+  def evaluate(self, decisions = None):
     if decisions:
-      for index, decision in enumerate(i.decisions):
+      for index, decision in enumerate(self.decisions):
         decision.value = decisions[index]
-    decisions = [decision.value for decision in i.decisions]
+    decisions = [decision.value for decision in self.decisions]
     g  = 1 + 9 * sum(decisions[1:]) / (len(decisions)-1)
-    i.objectives[0].value = decisions[0]
-    i.objectives[1].value = g * (1 - sqrt(decisions[0]/g))
-    return [i.objectives[0].value, i.objectives[1].value]
+    self.objectives[0].value = decisions[0]
+    self.objectives[1].value = g * (1 - sqrt(decisions[0]/g))
+    return [self.objectives[0].value, self.objectives[1].value]
 
   def get_ideal_decisions(self, count = 500):
     if self.ideal_decisions is not None and len(self.ideal_decisions) == count:

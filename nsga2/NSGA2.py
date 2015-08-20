@@ -255,6 +255,8 @@ class NSGA2(O):
       return min_dist, closest_point
 
     problem = self.problem
+    if problem.constraints:
+      return
     ideals = problem.get_ideal_objectives()
     predicts = [o.objectives for o in obtained]
     d_f = closest(ideals[0], predicts)[0]
