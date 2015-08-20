@@ -66,26 +66,44 @@ class ZDT1(Problem):
   def get_ideal_objectives(self, count=500):
     if self.ideal_objectives is not None:
       return self.ideal_objectives
-    one_start = 1/(2*500)
-    two_start = 1- (1/(2*500))
-    delta = 1/500
+    # one_start = 1/(2*500)
+    # two_start = 1- (1/(2*500))
+    # delta = 1/500
     self.ideal_objectives = []
-    for i in range(count):
-      self.ideal_objectives.append([one_start+i*delta, two_start-i*delta])
+    ideal_decisions = self.get_ideal_decisions(count)
+    for ideal_decision in ideal_decisions:
+      self.ideal_objectives.append(self.evaluate(ideal_decision))
     return self.ideal_objectives
 
-if __name__ == "__main__":
+
+def _run_once():
+  import nsga2.NSGA2 as optimizer
+  import random
+  random.seed(1)
+  o = ZDT1()
+  o.populate(optimizer.settings().pop_size)
+  nsga2 = optimizer.NSGA2(o)
+  goods, fronts = nsga2.generate()
+  print(nsga2.convergence(goods))
+  print(nsga2.diversity(fronts[0]))
+  nsga2.solution_range(goods)
+  print(goods[0])
+  o.plot(goods)
+
+def _run_many():
   import nsga2.NSGA2 as optimizer
   import random
   random.seed(1)
   gammas,deltas = [], []
-  for _ in range(10):
+  for _ in range(1):
     o = ZDT1()
     o.populate(optimizer.settings().pop_size)
     nsga2 = optimizer.NSGA2(o)
     goods, fronts = nsga2.generate()
     gammas.append(nsga2.convergence(goods))
     deltas.append(nsga2.diversity(fronts[0]))
-    nsga2.solution_range(goods)
   print(np.mean(gammas), np.var(gammas))
   print(np.mean(deltas), np.var(deltas))
+
+if __name__ == "__main__":
+  _run_once()

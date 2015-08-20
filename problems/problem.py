@@ -158,14 +158,17 @@ class Problem(O):
     else:
       return 0
 
-  def plot(self):
+  def plot(self, points, file_path="figures/tmp.png"):
     def get_column(matrix, index):
       return [row[index] for row in matrix]
-    ideal_objectives = self.get_ideal_objectives();
+    ideal_objectives = self.get_ideal_objectives()
     print(ideal_objectives[0])
     if len(ideal_objectives[0]) != 2:
       print("Can plot only 2d graphs")
       return
     x,y = get_column(ideal_objectives, 0), get_column(ideal_objectives, 1)
+    comp_objs = [point.objectives for point in points]
+    c_x, c_y = get_column(comp_objs, 0), get_column(comp_objs, 1)
     plt.plot(x, y)
-    plt.show()
+    plt.plot(c_x, c_y, 'ro')
+    plt.savefig(file_path)
