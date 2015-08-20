@@ -2,7 +2,7 @@ import sys
 import os
 sys.path.append(os.path.abspath("."))
 from utils.lib import *
-
+import matplotlib.pyplot as plt
 
 """
 :return
@@ -20,28 +20,28 @@ def compare(one, two, minimize=True):
   return status
 
 class Decision(O):
-  def __init__(i, name, low, high):
-    i.name = name
-    i.low = low
-    i.high = high
+  def __init__(self, name, low, high):
+    self.name = name
+    self.low = low
+    self.high = high
 
-  def norm(i, val):
-    return norm(val, i.low, i.high)
+  def norm(self, val):
+    return norm(val, self.low, self.high)
 
-  def deNorm(i, val):
-    return deNorm(val, i.low, i.high)
+  def deNorm(self, val):
+    return deNorm(val, self.low, self.high)
 
 
 class Objective(O):
-  def __init__(i, name, toMinimize=True, low=None, high=None):
-    i.name = name
-    i.toMinimize = toMinimize
-    i.low = low
-    i.high = high
-    i.value = None
+  def __init__(self, name, toMinimize=True, low=None, high=None):
+    self.name = name
+    self.toMinimize = toMinimize
+    self.low = low
+    self.high = high
+    self.value = None
 
-  def norm(i, val):
-    return norm(val, i.low, i.high)
+  def norm(self, val):
+    return norm(val, self.low, self.high)
 
 
 class Constraint(O):
@@ -60,6 +60,7 @@ class Problem(O):
     self.evals = 0
     self.population = []
     self.ideal_decisions = None
+    self.ideal_objectives = None
     self.constraints = []
 
   def generate(self):
@@ -156,3 +157,15 @@ class Problem(O):
       return 2
     else:
       return 0
+
+  def plot(self):
+    def get_column(matrix, index):
+      return [row[index] for row in matrix]
+    ideal_objectives = self.get_ideal_objectives();
+    print(ideal_objectives[0])
+    if len(ideal_objectives[0]) != 2:
+      print("Can plot only 2d graphs")
+      return
+    x,y = get_column(ideal_objectives, 0), get_column(ideal_objectives, 1)
+    plt.plot(x, y)
+    plt.show()

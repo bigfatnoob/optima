@@ -61,6 +61,27 @@ class CONSTR(Problem):
     return [self.objectives[0].value, self.objectives[1].value]
 
 
+  def get_ideal_decisions(self, count = 500):
+    if self.ideal_decisions is not None and len(self.ideal_decisions) == count:
+      return self.ideal_decisions
+    start = 1/(2*500)
+    delta = 1/500
+    self.ideal_decisions = []
+    for i in range(count):
+      self.ideal_decisions.append([start + i*delta]+[0]*29)
+    return self.ideal_decisions
+
+  def get_ideal_objectives(self, count=500):
+    if self.ideal_objectives is not None:
+      return self.ideal_objectives
+    one_start = 1/(2*500)
+    two_start = 1- (1/(2*500))
+    delta = 1/500
+    self.ideal_objectives = []
+    for i in range(count):
+      self.ideal_objectives.append([one_start+i*delta, two_start-i*delta])
+    return self.ideal_objectives
+
 if __name__ == "__main__":
   import nsga2.NSGA2 as optimizer
   import random
@@ -68,8 +89,9 @@ if __name__ == "__main__":
   o = CONSTR()
   o.populate(optimizer.settings().pop_size)
   nsga2 = optimizer.NSGA2(o, 500)
-  goods, fronts = nsga2.generate()
-  print(nsga2.convergence(goods))
-  print(nsga2.diversity(fronts[0]))
-  nsga2.solution_range(goods)
+  # goods, fronts = nsga2.generate()
+  # print(nsga2.convergence(goods))
+  # print(nsga2.diversity(fronts[0]))
+  # nsga2.solution_range(goods)
+  o.plot()
 

@@ -37,6 +37,22 @@ class ZDT1(Problem):
     self.objectives[1].value = g * (1 - sqrt(decisions[0]/g))
     return [self.objectives[0].value, self.objectives[1].value]
 
+  def norm(self, one):
+    normalized = []
+    for i, dec in enumerate(one):
+      normalized.append(self.objectives[i].norm(dec))
+    return normalized
+
+  def dist(self, one, two):
+    one_norm = self.norm(one)
+    two_norm = self.norm(two)
+    delta = 0
+    count = 0
+    for i,j in zip(one_norm, two_norm):
+      delta += (i-j) ** 2
+      count += 1
+    return (delta/count) ** 0.5
+
   def get_ideal_decisions(self, count = 500):
     if self.ideal_decisions is not None and len(self.ideal_decisions) == count:
       return self.ideal_decisions
@@ -57,23 +73,6 @@ class ZDT1(Problem):
     for i in range(count):
       self.ideal_objectives.append([one_start+i*delta, two_start-i*delta])
     return self.ideal_objectives
-
-  def norm(self, one):
-    normalized = []
-    for i, dec in enumerate(one):
-      normalized.append(self.objectives[i].norm(dec))
-    return normalized
-
-  def dist(self, one, two):
-    one_norm = self.norm(one)
-    two_norm = self.norm(two)
-    delta = 0
-    count = 0
-    for i,j in zip(one_norm, two_norm):
-      delta += (i-j) ** 2
-      count += 1
-    return (delta/count) ** 0.5
-
 
 if __name__ == "__main__":
   import nsga2.NSGA2 as optimizer
