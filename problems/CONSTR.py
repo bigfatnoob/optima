@@ -1,6 +1,7 @@
 from __future__ import print_function, division
 from problem import *
 from copy import deepcopy
+import numpy as np
 
 """
 No of Decisions = n = 2.
@@ -104,5 +105,9 @@ if __name__ == "__main__":
   print(nsga2.convergence(goods))
   print(nsga2.diversity(fronts[0]))
   nsga2.solution_range(goods)
-  o.plot(goods)
+  x = np.arange(0.1,1.0,0.005)
+  c1 = [6 - 9 * pt for pt in x]
+  c2 = [9 * pt - 1 for pt in x]
+  constraints = [[x, c1], [x, c2]]
+  o.plot(goods, constraints)
 

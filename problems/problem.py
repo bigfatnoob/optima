@@ -158,7 +158,7 @@ class Problem(O):
     else:
       return 0
 
-  def plot(self, points = None, file_path="figures/tmp.png"):
+  def plot(self, points = None, constraints = None,  file_path="figures/tmp.png"):
     def get_column(matrix, index):
       return [row[index] for row in matrix]
     ideal_objectives = self.get_ideal_objectives()
@@ -172,4 +172,7 @@ class Problem(O):
      comp_objs = [point.objectives for point in points]
      c_x, c_y = get_column(comp_objs, 0), get_column(comp_objs, 1)
      plt.plot(c_x, c_y, 'ro')
+    if constraints:
+      for row in constraints:
+        plt.plot(row[0], row[1])
     plt.savefig(file_path)
