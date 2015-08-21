@@ -96,8 +96,8 @@ class Problem(O):
     return False, 0
 
   def dominates(self, one, two):
-    one_status, one_offset = self.evaluate_constraints(one)
-    two_status, two_offset = self.evaluate_constraints(two)
+    one_status, one_offset = self.evaluate_constraints(one.decisions)
+    two_status, two_offset = self.evaluate_constraints(two.decisions)
     better = self.better(one, two)
     if not one_status and not two_offset:
       # Return the better solution if both solutions satisfy the constraints
@@ -158,7 +158,7 @@ class Problem(O):
     else:
       return 0
 
-  def plot(self, points, file_path="figures/tmp.png"):
+  def plot(self, points = None, file_path="figures/tmp.png"):
     def get_column(matrix, index):
       return [row[index] for row in matrix]
     ideal_objectives = self.get_ideal_objectives()
@@ -167,8 +167,9 @@ class Problem(O):
       print("Can plot only 2d graphs")
       return
     x,y = get_column(ideal_objectives, 0), get_column(ideal_objectives, 1)
-    comp_objs = [point.objectives for point in points]
-    c_x, c_y = get_column(comp_objs, 0), get_column(comp_objs, 1)
     plt.plot(x, y)
-    plt.plot(c_x, c_y, 'ro')
+    if points:
+     comp_objs = [point.objectives for point in points]
+     c_x, c_y = get_column(comp_objs, 0), get_column(comp_objs, 1)
+     plt.plot(c_x, c_y, 'ro')
     plt.savefig(file_path)

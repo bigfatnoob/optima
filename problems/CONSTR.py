@@ -1,6 +1,6 @@
 from __future__ import print_function, division
 from problem import *
-
+from copy import deepcopy
 
 """
 No of Decisions = n = 2.
@@ -33,7 +33,7 @@ class CONSTR(Problem):
     self.ideal_decisions = None
     self.ideal_objectives = None
 
-  def evaluateConstraints(self, decisions = None):
+  def evaluate_constraints(self, decisions = None):
     status = False
     offset = 0
     if decisions:
@@ -64,22 +64,33 @@ class CONSTR(Problem):
   def get_ideal_decisions(self, count = 500):
     if self.ideal_decisions is not None and len(self.ideal_decisions) == count:
       return self.ideal_decisions
-    start = 1/(2*500)
-    delta = 1/500
-    self.ideal_decisions = []
-    for i in range(count):
-      self.ideal_decisions.append([start + i*delta]+[0]*29)
+    base_delta = 1/(count**(1 / len(self.decisions)))
+    print(base_delta)
+    starts = [decision.low + base_delta / 2 for decision in self.decisions]
+    deltas = [(decision.high - decision.low) * base_delta for decision in self.decisions]
+    ideal_decisions = [starts]
+    for i in range(len(starts)) :
+      temp_pop = []
+      for decision in ideal_decisions:
+        last_dec = deepcopy(decision)
+        while True:
+          temp_decision = deepcopy(last_dec)
+          temp_decision[i] += deltas[i]
+          if temp_decision[i] < self.decisions[i].high:
+            temp_pop.append(temp_decision)
+            last_dec = temp_pop[-1]
+          else :
+            break;
+      ideal_decisions += temp_pop
+    self.ideal_decisions = ideal_decisions
     return self.ideal_decisions
 
   def get_ideal_objectives(self, count=500):
     if self.ideal_objectives is not None:
       return self.ideal_objectives
-    one_start = 1/(2*500)
-    two_start = 1- (1/(2*500))
-    delta = 1/500
     self.ideal_objectives = []
-    for i in range(count):
-      self.ideal_objectives.append([one_start+i*delta, two_start-i*delta])
+    for decisions in self.get_ideal_decisions(count):
+      self.ideal_objectives.append(self.evaluate(decisions))
     return self.ideal_objectives
 
 if __name__ == "__main__":
@@ -89,9 +100,9 @@ if __name__ == "__main__":
   o = CONSTR()
   o.populate(optimizer.settings().pop_size)
   nsga2 = optimizer.NSGA2(o, 500)
-  # goods, fronts = nsga2.generate()
-  # print(nsga2.convergence(goods))
-  # print(nsga2.diversity(fronts[0]))
-  # nsga2.solution_range(goods)
-  o.plot()
+  goods, fronts = nsga2.generate()
+  print(nsga2.convergence(goods))
+  print(nsga2.diversity(fronts[0]))
+  nsga2.solution_range(goods)
+  o.plot(goods)
 
