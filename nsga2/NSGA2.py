@@ -67,7 +67,7 @@ class NSGA2(O):
 
   def make_kids(self, population):
     kids = []
-    for _ in range(len(population)//2):
+    for _ in range(len(population)):
       mom = random.choice(population)
       while True:
         dad = random.choice(population)
@@ -129,7 +129,7 @@ class NSGA2(O):
       obj_max = frontier[-1].objectives[m]
       frontier[0].crowd_dist = float("inf")
       frontier[-1].crowd_dist = float("inf")
-      for i in range(1,len(frontier)-1):
+      for i in range(1,l-1):
         frontier[i].crowd_dist += (frontier[i+1].objectives[m] - frontier[i-1].objectives[m])/(obj_max - obj_min)
     return sorted(frontier, key=lambda x:x.crowd_dist, reverse=True)
 

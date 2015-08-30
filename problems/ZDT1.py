@@ -87,7 +87,6 @@ def _run_once():
   print(nsga2.convergence(goods))
   print(nsga2.diversity(fronts[0]))
   nsga2.solution_range(goods)
-  print(goods[0])
   o.plot(goods)
 
 def _run_many():
