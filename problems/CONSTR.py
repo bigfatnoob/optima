@@ -61,6 +61,21 @@ class CONSTR(Problem):
     self.objectives[1].value = (1+decisions[1])/decisions[0]
     return [self.objectives[0].value, self.objectives[1].value]
 
+  def norm(self, one):
+    normalized = []
+    for i, dec in enumerate(one):
+      normalized.append(self.objectives[i].norm(dec))
+    return normalized
+
+  def dist(self, one, two):
+    one_norm = self.norm(one)
+    two_norm = self.norm(two)
+    delta = 0
+    count = 0
+    for i,j in zip(one_norm, two_norm):
+      delta += (i-j) ** 2
+      count += 1
+    return (delta/count) ** 0.5
 
   def get_ideal_decisions(self, count = 500):
     if self.ideal_decisions is not None and len(self.ideal_decisions) == count:

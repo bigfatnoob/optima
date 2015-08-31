@@ -128,3 +128,24 @@ def get_betaq(rand, alpha, eta=30):
 def say(*lst):
   print(*lst, end="")
   sys.stdout.flush()
+
+def rand_one(lst):
+  return random.choice(lst)
+
+def more(x,y):
+  """
+  Check if x > y
+  :param x: Left Comparative Value
+  :param y: Right Comparative Value
+  :return: Boolean
+  """
+  return x > y
+
+def less(x,y):
+  """
+  Check if x < y
+  :param x: Left Comparative Value
+  :param y: Right Comparative Value
+  :return: Boolean
+  """
+  return x < y
