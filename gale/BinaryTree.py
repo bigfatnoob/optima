@@ -1,6 +1,5 @@
 __author__ = 'panzer'
 
-
 class BinaryTree:
   def __init__(self):
     """
