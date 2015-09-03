@@ -83,9 +83,10 @@ def _run_once():
   o = ZDT1()
   o.populate(optimizer.settings().pop_size)
   nsga2 = optimizer.NSGA2(o)
-  goods, fronts = nsga2.generate()
+  #goods, fronts = nsga2.generate()
+  goods = nsga2.run()
   print(nsga2.convergence(goods))
-  print(nsga2.diversity(fronts[0]))
+  print(nsga2.diversity(goods))
   nsga2.solution_range(goods)
   o.plot(goods)
 
@@ -100,7 +101,7 @@ def _run_many():
     nsga2 = optimizer.NSGA2(o)
     goods, fronts = nsga2.generate()
     gammas.append(nsga2.convergence(goods))
-    deltas.append(nsga2.diversity(fronts[0]))
+    deltas.append(nsga2.diversity(goods))
   print(np.mean(gammas), np.var(gammas))
   print(np.mean(deltas), np.var(deltas))
 

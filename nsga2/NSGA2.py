@@ -3,6 +3,7 @@ import sys
 import os
 sys.path.append(os.path.abspath("."))
 from utils.lib import *
+from utils.algorithm import *
 from copy import copy
 import numpy as np
 
@@ -21,6 +22,7 @@ def loo(points):
 
 class Point(O):
   def __init__(self, decisions, problem, do_eval = True):
+    O.__init__(self)
     self.decisions = decisions
     self.rank = 0
     self.dominated = []
@@ -34,41 +36,47 @@ class Point(O):
 
 
 
-class NSGA2(O):
+class NSGA2(Algorithm):
   def __init__(self, problem, max_eval = 250):
-    self.problem = problem
+    Algorithm.__init__(self, 'NSGA2',problem)
+    self.select = self.selector
+    self.evolve = self.evolver
     self.frontiers = []
     self.max_eval = max_eval
 
-  """
-  Runner method that generates the best
-  possible solutions using nsga2.
-  """
-  def generate(self):
-    P = copy(self.problem.population)
-    pop_size = len(P)
+  def selector(self, population):
+    kids = self.make_kids(population)
+    return population + kids
+
+  def evolver(self, population, size):
+    fronts = self.fast_non_dom_sort(population)
+    pop_next = []
+    for i, front in enumerate(fronts):
+      fronts[i] = self.assign_crowd_dist(front)
+      pop_next += fronts[i]
+      if len(pop_next) >= size:
+        pop_next = pop_next[:size]
+        break
+    return pop_next
+
+  def run(self):
+    population = copy(self.problem.population)
+    pop_size = len(population)
+    points = []
     while self.problem.evals < self.max_eval:
       say(".")
-      Q = self.make_kids(P)
-      R = P + Q
-      fronts = self.fast_non_dom_sort(R)
-      P_next = []
-      for i, front in enumerate(fronts):
-        fronts[i] = self.assign_crowd_dist(front)
-        P_next += fronts[i]
-        if len(P_next) >= pop_size:
-          P_next = P_next[:pop_size]
-          break
-      P = [point.decisions for point in P_next]
+      population = self.select(population)
+      points = self.evolve(population, pop_size)
+      population = [point.decisions for point in points]
       self.problem.evals += 1
     print("")
-    return P_next, fronts[:i]
-
+    return points
 
   def make_kids(self, population):
     kids = []
     for _ in range(len(population)):
       mom = random.choice(population)
+      dad = None
       while True:
         dad = random.choice(population)
         if mom != dad: break
@@ -162,15 +170,15 @@ class NSGA2(O):
       some = random.random()
 
       #sis
-      beta = 1 + (2 * (small - low)/(large - small))
-      alpha = 2 - beta ** -(eta+1)
+      beta = 1.0 + (2.0 * (small - low)/(large - small))
+      alpha = 2.0 - beta ** (-(eta+1.0))
       betaq = get_betaq(some, alpha, eta)
       sis[i] = 0.5 * ((small+large) - betaq * (large - small))
       sis[i] = max(low, min(sis[i], up))
 
       #bro
-      beta = 1 + (2 * (up - large)/(large - small))
-      alpha = 2 - beta ** -(eta+1)
+      beta = 1.0 + (2.0 * (up - large)/(large - small))
+      alpha = 2.0 - beta ** (-(eta+1.0))
       betaq = get_betaq(some, alpha, eta)
       bro[i] = 0.5 * ((small+large) + betaq * (large - small))
       bro[i] = max(low, min(bro[i], up))

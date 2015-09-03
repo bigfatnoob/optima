@@ -96,7 +96,7 @@ class CONSTR(Problem):
             temp_pop.append(temp_decision)
             last_dec = temp_pop[-1]
           else :
-            break;
+            break
       ideal_decisions += temp_pop
     self.ideal_decisions = ideal_decisions
     return self.ideal_decisions
@@ -116,9 +116,9 @@ if __name__ == "__main__":
   o = CONSTR()
   o.populate(optimizer.settings().pop_size)
   nsga2 = optimizer.NSGA2(o, 500)
-  goods, fronts = nsga2.generate()
+  goods = nsga2.run()
   print(nsga2.convergence(goods))
-  print(nsga2.diversity(fronts[0]))
+  print(nsga2.diversity(goods))
   nsga2.solution_range(goods)
   x = np.arange(0.1,1.0,0.005)
   c1 = [6 - 9 * pt for pt in x]
