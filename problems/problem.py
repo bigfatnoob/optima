@@ -86,10 +86,10 @@ class Problem(O):
   def get_ideal_decisions(self, count = 500):
     pass
 
-  def dist(self, one, two):
+  def dist(self, one, two, is_obj=True):
     pass
 
-  def norm(self, one):
+  def norm(self, one, is_obj=True):
     pass
 
   def evaluate_constraints(self, one):

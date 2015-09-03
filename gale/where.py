@@ -8,7 +8,7 @@ __author__ = 'george'
 def settings():
   return O(
     verbose =  False,
-    b4 = '|..',
+    b4 = '|.. ',
     seed = 1
   )
 
@@ -58,8 +58,11 @@ class NodePoint(O):
     other.c, other.x = self.c, self.x
     return other
 
-  def dist(self, problem, one):
-    return problem.dist(self.decisions, one.decisions)
+  def dist(self, problem, one, is_obj=True):
+    if is_obj:
+      return problem.dist(self.objectives, one.objectives, is_obj)
+    else :
+      return problem.dist(self.decisions, one.decisions, is_obj)
 
   def closest(self, problem, pop, init=sys.maxint, better=less):
     """
@@ -72,7 +75,7 @@ class NodePoint(O):
     dist, out = init, None
     for one in pop:
       if one != self:
-        tmp = self.dist(problem, one)
+        tmp = self.dist(problem, one, is_obj=False)
         if better(tmp, dist):
           dist, out = tmp, one
     return one
@@ -84,7 +87,7 @@ class NodePoint(O):
     :param pop: Population
     :return: farthest point from self in pop
     """
-    self.closest(problem, pop, init=-sys.maxint, better=more)
+    return self.closest(problem, pop, init=-sys.maxint, better=more)
 
 
 
@@ -136,10 +139,10 @@ class Node(BinaryTree):
     one = rand_one(pop)
     self.west = one.furthest(problem, pop)
     self.east = one.furthest(problem, pop)
-    self.c = self.west.dist(self.east)
+    self.c = self.west.dist(problem, self.east, is_obj=False)
     for one in pop:
-      a = one.dist(self.west)
-      b = one.dist(self.east)
+      a = one.dist(problem, self.west, is_obj=False)
+      b = one.dist(problem, self.east, is_obj=False)
       one.x = Node.projection(a, b, self.c)
       one.c = self.c
       one.a = a
@@ -162,8 +165,29 @@ class Node(BinaryTree):
     :return:
     """
     self._pop = self.fastmap(self.problem, self._pop)
+    self.n = len(self._pop)
     n = len(self._pop)
     if n >= threshold:
       wests, easts = self.split(self._pop)
-    pass
+      self.left = Node(self.problem, wests, self.total_size, self, self.level+1).divide(threshold)
+      self.right = Node(self.problem, easts, self.total_size, self, self.level+1).divide(threshold)
+    return self
 
+  def show(self):
+    out = ""
+    out += (self.level - 1) * settings().b4 + str(self.n) + " (" + str(id(self) % 1000)+ ") \n"
+    if self.left:
+      out += self.left.show()
+    if self.right:
+      out += self.right.show()
+    return out
+
+def _test():
+  from problems.ZDT1 import ZDT1
+  o = ZDT1()
+  o.populate(100)
+  node = Node(o, Node.format(o.population), 100).divide(sqrt(o.population))
+  print(node.show())
+
+if __name__ == "__main__":
+  _test()

@@ -6,7 +6,7 @@ import sys
 """
 Default class which everything extends.
 """
-class O:
+class O():
   def __init__(i,**d): i.has().update(**d)
   def has(i): return i.__dict__
   def update(i,**d) : i.has().update(d); return i
