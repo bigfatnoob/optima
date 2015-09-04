@@ -93,7 +93,7 @@ class NodePoint(O):
 
 class Node(BinaryTree):
   """
-
+  Represents node of a tree
   """
   @staticmethod
   def format(pop):
@@ -131,9 +131,9 @@ class Node(BinaryTree):
 
   def fastmap(self, problem, pop):
     """
-
-    :param problem:
-    :param pop:
+    Fastmap function that projects all the points on the principal component
+    :param problem: Instance of the problem
+    :param pop: Set of points in the cluster population
     :return:
     """
     one = rand_one(pop)
@@ -152,6 +152,11 @@ class Node(BinaryTree):
 
 
   def split(self, pop):
+    """
+    Split the population at the midpoint
+    :param pop:
+    :return:
+    """
     mid = int(len(pop)/2)
     self.x = pop[mid].x
     self.east = pop[0]

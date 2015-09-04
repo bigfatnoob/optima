@@ -8,12 +8,22 @@ from copy import copy
 import numpy as np
 
 def settings():
+  """
+  Default Settings for NSGA 2
+  :return:
+  """
   return O(
     pop_size = 100,
     max_iter = 250
   )
 
 def loo(points):
+  """
+  Iterator which generates a
+  test case and training set
+  :param points:
+  :return:
+  """
   for i in range(len(points)):
     one = points[i]
     rest = points[:i] + points[i+1:]
@@ -21,7 +31,14 @@ def loo(points):
 
 
 class Point(O):
+
   def __init__(self, decisions, problem, do_eval = True):
+    """
+    Represents a point in the frontier for NSGA
+    :param decisions: Set of decisions
+    :param problem: Instance of the problem
+    :param do_eval: Flag to check if evaluation has to be performed
+    """
     O.__init__(self)
     self.decisions = decisions
     self.rank = 0
@@ -37,18 +54,34 @@ class Point(O):
 
 
 class NSGA2(Algorithm):
-  def __init__(self, problem, max_eval = 250):
+  def __init__(self, problem, gens = 250):
+    """
+    Initialize NSGA2 algorithm
+    :param problem: Instance of the problem
+    :param gens: Max number of Generations
+    """
     Algorithm.__init__(self, 'NSGA2',problem)
     self.select = self.selector
     self.evolve = self.evolver
     self.frontiers = []
-    self.max_eval = max_eval
+    self.gens = gens
 
   def selector(self, population):
+    """
+    Selector Function
+    :param population: Population
+    :return : Population and its kids
+    """
     kids = self.make_kids(population)
     return population + kids
 
   def evolver(self, population, size):
+    """
+    Mutator Function: Performs crossover and polynomial mutation
+    :param population:Population that needs to be evolved
+    :param size: Expected size of the result
+    :return : The mutated population
+    """
     fronts = self.fast_non_dom_sort(population)
     pop_next = []
     for i, front in enumerate(fronts):
@@ -60,19 +93,28 @@ class NSGA2(Algorithm):
     return pop_next
 
   def run(self):
+    """
+    Runner function that runs the NSGA2 optimization algorithm
+    """
     population = copy(self.problem.population)
     pop_size = len(population)
     points = []
-    while self.problem.evals < self.max_eval:
+    gens = 0
+    while gens < self.gens:
       say(".")
       population = self.select(population)
       points = self.evolve(population, pop_size)
       population = [point.decisions for point in points]
-      self.problem.evals += 1
+      gens += 1
     print("")
     return points
 
   def make_kids(self, population):
+    """
+    Function that makes kids from the parents
+    :param population: Parent population
+    :return : Kids of the parents
+    """
     kids = []
     for _ in range(len(population)):
       mom = random.choice(population)
@@ -92,6 +134,9 @@ class NSGA2(Algorithm):
   :return - List of Frontiers
   """
   def fast_non_dom_sort(self, population = None):
+    """
+    Fast dominated sorting algorithm
+    """
     frontiers = []
     front1 = []
     if population is None:
@@ -125,11 +170,11 @@ class NSGA2(Algorithm):
         front1 = front2
     return frontiers
 
-  """
-  Crowding distance between each point in
-  a frontier.
-  """
   def assign_crowd_dist(self, frontier):
+    """
+    Crowding distance between each point in
+    a frontier.
+    """
     l = len(frontier)
     for m in range(len(self.problem.objectives)):
       frontier = sorted(frontier, key=lambda x:x.objectives[m])
@@ -141,12 +186,12 @@ class NSGA2(Algorithm):
         frontier[i].crowd_dist += (frontier[i+1].objectives[m] - frontier[i-1].objectives[m])/(obj_max - obj_min)
     return sorted(frontier, key=lambda x:x.crowd_dist, reverse=True)
 
-  """
-  Simulated Binary Crossover Between Mummy And Daddy.
-  Produces Sister and Brother.
-  cr = probability of crossover
-  """
   def sbx_crossover(self, mom, dad, cr=0.9, eta=30):
+    """
+    Simulated Binary Crossover Between Mummy And Daddy.
+    Produces Sister and Brother.
+    cr = probability of crossover
+    """
     problem = self.problem
     sis = [0]*len(mom)
     bro = [0]*len(mom)
@@ -184,11 +229,11 @@ class NSGA2(Algorithm):
       bro[i] = max(low, min(bro[i], up))
     return sis, bro
 
-  """
-  Perform Polynomial Mutation on a point.
-  Mutation Rate = 1/No of Decisions in Problem
-  """
   def poly_mutate(self, one, eta = 20):
+    """
+    Perform Polynomial Mutation on a point.
+    Mutation Rate = 1/No of Decisions in Problem
+    """
     problem = self.problem
     mr = 1 / len(problem.decisions)
     mutant = [0] * len(problem.decisions)
@@ -218,11 +263,11 @@ class NSGA2(Algorithm):
 
     return mutant
 
-  """
-  Calculate the convergence metric with respect to ideal
-  solutions
-  """
   def convergence(self, obtained):
+    """
+    Calculate the convergence metric with respect to ideal
+    solutions
+    """
     problem = self.problem
     if problem.constraints:
       return
@@ -233,10 +278,11 @@ class NSGA2(Algorithm):
       gammas.append(min([problem.dist(predict, ideal) for ideal in ideals]))
     return np.mean(gammas)
 
-  """
-  Calculate the range for each objective
-  """
-  def solution_range(self, obtained):
+  @staticmethod
+  def solution_range(obtained):
+    """
+    Calculate the range for each objective
+    """
     predicts = [o.objectives for o in obtained]
     solutions = [[] for _ in range(len(predicts[0]))]
     for predict in predicts:
