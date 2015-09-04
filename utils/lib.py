@@ -2,6 +2,7 @@ from __future__ import division, print_function
 from constants import EPS
 import random
 import sys
+import math
 
 """
 Default class which everything extends.
@@ -149,3 +150,28 @@ def less(x,y):
   :return: Boolean
   """
   return x < y
+
+def avg(lst):
+  """
+  Average of list
+  :param lst:
+  :return:
+  """
+  return sum(lst)/float(len(lst))
+
+def loss(x1, x2, mins=None, maxs=None):
+  """
+  Compute Normalized difference between two vectors
+  :param x1: List 1
+  :param x2: List 2
+  :param mins: Min Possible Values
+  :param maxs: Max Possible values
+  :return:
+  """
+  #normalize if mins and maxs are given
+  if mins and maxs:
+      x1 = [norm(x, mins[i], maxs[i]) for i,x in enumerate(x1)]
+      x2 = [norm(x, mins[i], maxs[i]) for i,x in enumerate(x2)]
+
+  o = min(len(x1), len(x2)) #len of x1 and x2 should be equal
+  return sum([math.exp((x2i - x1i)/o) for x1i, x2i in zip(x1,x2)])/o

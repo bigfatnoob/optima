@@ -37,26 +37,6 @@ class ZDT1(Problem):
     self.objectives[1].value = g * (1 - sqrt(decisions[0]/g))
     return [self.objectives[0].value, self.objectives[1].value]
 
-  def norm(self, one, is_obj = True):
-    normalized = []
-    if is_obj:
-      features = self.objectives
-    else:
-      features = self.decisions
-    for i, feature in enumerate(one):
-      normalized.append(features[i].norm(feature))
-    return normalized
-
-  def dist(self, one, two, is_obj = True):
-    one_norm = self.norm(one, is_obj)
-    two_norm = self.norm(two, is_obj)
-    delta = 0
-    count = 0
-    for i,j in zip(one_norm, two_norm):
-      delta += (i-j) ** 2
-      count += 1
-    return (delta/count) ** 0.5
-
   def get_ideal_decisions(self, count = 500):
     if self.ideal_decisions is not None and len(self.ideal_decisions) == count:
       return self.ideal_decisions

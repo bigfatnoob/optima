@@ -33,9 +33,9 @@ class Decision(O):
 
 
 class Objective(O):
-  def __init__(self, name, toMinimize=True, low=None, high=None):
+  def __init__(self, name, to_minimize=True, low=None, high=None):
     self.name = name
-    self.toMinimize = toMinimize
+    self.to_minimize = to_minimize
     self.low = low
     self.high = high
     self.value = None
@@ -75,10 +75,63 @@ class Problem(O):
       d.value = decisions[i]
 
   def populate(self, n):
+    """
+    Default method to create a population
+    :param n - Size of population
+    """
     self.population = []
     for _ in range(n):
       self.population.append(self.generate())
     return self.population
+
+  def norm(self, one, is_obj = True):
+    """
+    Method to normalize a point
+    :param one - Point to be normalized
+    :param is_obj - Boolean indicating Objective or Decision
+    """
+    normalized = []
+    if is_obj:
+      features = self.objectives
+    else:
+      features = self.decisions
+    for i, feature in enumerate(one):
+      normalized.append(features[i].norm(feature))
+    return normalized
+
+  def dist(self, one, two, one_norm = True, two_norm = True, is_obj = True):
+    """
+    Returns normalized euclidean distance between one and two
+    :param one - Point A
+    :param two - Point B
+    :param one_norm - If A has to be normalized
+    :param two_norm - If B has to be normalized
+    :param is_obj - If the points are objectives or decisions
+    """
+    one_norm = self.norm(one, is_obj) if one_norm else one
+    two_norm = self.norm(two, is_obj) if two_norm else two
+    delta = 0
+    count = 0
+    for i,j in zip(one_norm, two_norm):
+      delta += (i-j) ** 2
+      count += 1
+    return (delta/count) ** 0.5
+
+  def manhattan_dist(self, one, two, one_norm = True, two_norm = True, is_obj = True):
+    """
+    Returns manhattan distance between one and two
+    :param one - Point A
+    :param two - Point B
+    :param one_norm - If A has to be normalized
+    :param two_norm - If B has to be normalized
+    :param is_obj - If the points are objectives or decisions
+    """
+    one_norm = self.norm(one, is_obj) if one_norm else one
+    two_norm = self.norm(two, is_obj) if two_norm else two
+    delta = 0
+    for i, j in zip(one_norm, two_norm):
+      delta += abs(i -j)
+    return delta
 
   def evaluate(self, decisions=None):
     pass
@@ -86,16 +139,13 @@ class Problem(O):
   def get_ideal_decisions(self, count = 500):
     pass
 
-  def dist(self, one, two, is_obj=True):
-    pass
-
-  def norm(self, one, is_obj=True):
-    pass
-
   def evaluate_constraints(self, one):
     return False, 0
 
   def dominates(self, one, two):
+    """
+    Check if one dominates two
+    """
     one_status, one_offset = self.evaluate_constraints(one.decisions)
     two_status, two_offset = self.evaluate_constraints(two.decisions)
     better = self.better(one, two)
@@ -141,7 +191,7 @@ class Problem(O):
     one_at_least_once = False
     two_at_least_once = False
     for index, (a, b) in enumerate(zip(obj1, obj2)):
-      status = compare(a, b, self.objectives[index].toMinimize)
+      status = compare(a, b, self.objectives[index].to_minimize)
       if status == -1:
         #obj2[i] better than obj1[i]
         two_at_least_once = True

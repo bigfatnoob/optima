@@ -275,7 +275,7 @@ class NSGA2(Algorithm):
     predicts = [o.objectives for o in obtained]
     gammas = []
     for predict in predicts:
-      gammas.append(min([problem.dist(predict, ideal) for ideal in ideals]))
+      gammas.append(min([problem.dist(predict, ideal, one_norm = True, two_norm = True) for ideal in ideals]))
     return np.mean(gammas)
 
   @staticmethod
@@ -302,7 +302,7 @@ class NSGA2(Algorithm):
       min_dist = sys.maxint
       closest_point = None
       for this in many:
-        dist = self.problem.dist(this, one)
+        dist = self.problem.dist(this, one, one_norm = True, two_norm = True)
         if dist < min_dist:
           min_dist = dist
           closest_point = this
@@ -317,7 +317,7 @@ class NSGA2(Algorithm):
     d_l = closest(ideals[-1], predicts)[0]
     distances = []
     for i in range(len(predicts)-1):
-      distances.append(problem.dist(predicts[i], predicts[i+1]))
+      distances.append(problem.dist(predicts[i], predicts[i+1], one_norm = True, two_norm = True))
     d_bar = np.mean(distances)
     d_sum = sum([abs(d_i - d_bar) for d_i in distances])
     delta = (d_f + d_l + d_sum) / (d_f + d_l + (len(predicts) - 1)*d_bar)
