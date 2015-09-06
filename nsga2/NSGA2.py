@@ -30,7 +30,7 @@ def loo(points):
     yield one, rest
 
 
-class Point(O):
+class NSGAPoint(Point):
 
   def __init__(self, decisions, problem=None):
     """
@@ -39,15 +39,10 @@ class Point(O):
     :param problem: Instance of the problem
     :param do_eval: Flag to check if evaluation has to be performed
     """
-    O.__init__(self)
-    self.decisions = decisions
+    Point.__init__(self, decisions, problem)
     self.rank = 0
     self.dominated = []
     self.dominating = 0
-    if problem:
-      self.objectives = problem.evaluate(decisions)
-    else:
-      self.objectives = []
     self.crowd_dist = 0
 
   def clone(self):
@@ -55,20 +50,9 @@ class Point(O):
     Method to clone a point
     :return:
     """
-    new = Point(self.decisions)
+    new = NSGAPoint(self.decisions)
     new.objectives = self.objectives
     return new
-
-  def evaluate(self, problem):
-    """
-    Evaluate a point
-    :param problem: Problem used to evaluate
-    """
-    if not self.objectives:
-      self.objectives = problem.evaluate(self.decisions)
-
-  def __eq__(self, other):
-    return self.decisions == other.decisions
 
   def __gt__(self, other):
     if self.rank != other.rank:
@@ -94,7 +78,7 @@ class NSGA2(Algorithm):
     """
     Runner function that runs the NSGA2 optimization algorithm
     """
-    population = [Point(one) for one in self.problem.population]
+    population = [NSGAPoint(one) for one in self.problem.population]
     pop_size = len(population)
     points = []
     gens = 0
@@ -124,7 +108,7 @@ class NSGA2(Algorithm):
       sis, bro = self.sbx_crossover(mom.decisions, dad.decisions)
       sis = self.poly_mutate(sis)
       bro = self.poly_mutate(bro)
-      kids += [Point(sis), Point(bro)]
+      kids += [NSGAPoint(sis), NSGAPoint(bro)]
     return clones + kids
 
   def evolver(self, population, size):

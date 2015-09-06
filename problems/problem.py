@@ -43,7 +43,6 @@ class Objective(O):
   def norm(self, val):
     return norm(val, self.low, self.high)
 
-
 class Constraint(O):
   def __init__(self, name):
     self.name = name
