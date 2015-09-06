@@ -32,7 +32,7 @@ def loo(points):
 
 class Point(O):
 
-  def __init__(self, decisions, problem, do_eval = True):
+  def __init__(self, decisions, problem=None):
     """
     Represents a point in the frontier for NSGA
     :param decisions: Set of decisions
@@ -44,13 +44,37 @@ class Point(O):
     self.rank = 0
     self.dominated = []
     self.dominating = 0
-    if do_eval:
+    if problem:
       self.objectives = problem.evaluate(decisions)
     else:
       self.objectives = []
     self.crowd_dist = 0
 
+  def clone(self):
+    """
+    Method to clone a point
+    :return:
+    """
+    new = Point(self.decisions)
+    new.objectives = self.objectives
+    return new
 
+  def evaluate(self, problem):
+    """
+    Evaluate a point
+    :param problem: Problem used to evaluate
+    """
+    if not self.objectives:
+      self.objectives = problem.evaluate(self.decisions)
+
+  def __eq__(self, other):
+    return self.decisions == other.decisions
+
+  def __gt__(self, other):
+    if self.rank != other.rank:
+      return self.crowd_dist > other.crowd_dist
+    else:
+      return self.rank < other.rank
 
 
 class NSGA2(Algorithm):
@@ -66,14 +90,42 @@ class NSGA2(Algorithm):
     self.frontiers = []
     self.gens = gens
 
-  def selector(self, population):
+  def run(self):
+    """
+    Runner function that runs the NSGA2 optimization algorithm
+    """
+    population = [Point(one) for one in self.problem.population]
+    pop_size = len(population)
+    points = []
+    gens = 0
+    while gens < self.gens:
+      say(".")
+      population = self.select(population)
+      population = self.evolve(population, pop_size)
+      gens += 1
+    print("")
+    return population
+
+  def selector(self, population, is_domination = True):
     """
     Selector Function
     :param population: Population
+    :param is_domination: Boolean parameter that decides
     :return : Population and its kids
     """
-    kids = self.make_kids(population)
-    return population + kids
+    kids = []
+    clones = [one.clone() for one in population]
+    for _ in range(len(clones)//2):
+      mom = self.bin_select_tournament(clones, 4, is_domination)
+      dad = None
+      while True:
+        dad = self.bin_select_tournament(clones, 4, is_domination)
+        if not mom == dad: break
+      sis, bro = self.sbx_crossover(mom.decisions, dad.decisions)
+      sis = self.poly_mutate(sis)
+      bro = self.poly_mutate(bro)
+      kids += [Point(sis), Point(bro)]
+    return clones + kids
 
   def evolver(self, population, size):
     """
@@ -92,57 +144,35 @@ class NSGA2(Algorithm):
         break
     return pop_next
 
-  def run(self):
+  def bin_select_tournament(self, population, tourn_size, is_domination = True):
     """
-    Runner function that runs the NSGA2 optimization algorithm
+    Select 2 individuals from the population of size tournsize
+    :param population:
+    :param tourn_size:
+    :return:
     """
-    population = copy(self.problem.population)
-    pop_size = len(population)
-    points = []
-    gens = 0
-    while gens < self.gens:
-      say(".")
-      population = self.select(population)
-      points = self.evolve(population, pop_size)
-      population = [point.decisions for point in points]
-      gens += 1
-    print("")
-    return points
+    tourn = random.sample(population, tourn_size)
+    best = tourn[0]
+    for i in range(1, len(tourn)):
+      if is_domination:
+        if self.problem.dominates(tourn[i], best) == 1:
+          best = tourn[i]
+      else:
+        if tourn[i] > best:
+          best = tourn[i]
+    return best
 
-  def make_kids(self, population):
+  def fast_non_dom_sort(self, population):
     """
-    Function that makes kids from the parents
-    :param population: Parent population
-    :return : Kids of the parents
-    """
-    kids = []
-    for _ in range(len(population)):
-      mom = random.choice(population)
-      dad = None
-      while True:
-        dad = random.choice(population)
-        if mom != dad: break
-      sis, bro = self.sbx_crossover(mom, dad)
-      sis = self.poly_mutate(sis)
-      bro = self.poly_mutate(bro)
-      kids += [sis, bro]
-    return kids
-
-  """
-  Fast Non Dominated Sort
-  :param - Population to sort
-  :return - List of Frontiers
-  """
-  def fast_non_dom_sort(self, population = None):
-    """
-    Fast dominated sorting algorithm
+    Fast Non Dominated Sort
+    :param - Population to sort
+    :return - List of Frontiers
     """
     frontiers = []
     front1 = []
-    if population is None:
-      population = self.problem.population
-    points = [Point(one, self.problem) for one in population]
-    for one, rest in loo(points):
+    for one in population:
+      one.evaluate(self.problem)
+    for one, rest in loo(population):
       for two in rest:
         domination_status = self.problem.dominates(one, two)
         if domination_status == 1:
