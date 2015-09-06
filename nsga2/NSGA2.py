@@ -3,18 +3,17 @@ import sys
 import os
 sys.path.append(os.path.abspath("."))
 from utils.lib import *
-from utils.algorithm import *
-from copy import copy
+from utils.algorithm import Algorithm
 import numpy as np
 
 def settings():
   """
   Default Settings for NSGA 2
-  :return:
+  :return: default settings
   """
   return O(
     pop_size = 100,
-    max_iter = 250
+    gens = 250
   )
 
 def loo(points):
@@ -62,15 +61,28 @@ class NSGAPoint(Point):
 
 
 class NSGA2(Algorithm):
-  def __init__(self, problem, gens = 250):
+  """
+  Sort the first *k* *individuals* into different nondomination levels
+  using the "Fast Nondominated Sorting Approach" proposed by Deb et al.,
+  see [Deb2002]_. This algorithm has a time complexity of :math:`O(MN^2)`,
+  where :math:`M` is the number of objectives and :math:`N` the number of
+  individuals.
+
+  .. [Deb2002] Deb, Pratab, Agarwal, and Meyarivan, "A fast elitist
+     non-dominated sorting genetic algorithm for multi-objective
+     optimization: NSGA-II", 2002.
+
+  Check References folder for the paper
+  """
+  def __init__(self, problem, gens = settings().gens):
     """
     Initialize NSGA2 algorithm
     :param problem: Instance of the problem
-    :param gens: Max number of Generations
+    :param gens: Max number of generations
     """
     Algorithm.__init__(self, 'NSGA2',problem)
-    self.select = self.selector
-    self.evolve = self.evolver
+    self.select = self._select
+    self.evolve = self._evolve
     self.frontiers = []
     self.gens = gens
 
@@ -80,7 +92,6 @@ class NSGA2(Algorithm):
     """
     population = [NSGAPoint(one) for one in self.problem.population]
     pop_size = len(population)
-    points = []
     gens = 0
     while gens < self.gens:
       say(".")
@@ -90,7 +101,7 @@ class NSGA2(Algorithm):
     print("")
     return population
 
-  def selector(self, population, is_domination = True):
+  def _select(self, population, is_domination = True):
     """
     Selector Function
     :param population: Population
@@ -111,7 +122,7 @@ class NSGA2(Algorithm):
       kids += [NSGAPoint(sis), NSGAPoint(bro)]
     return clones + kids
 
-  def evolver(self, population, size):
+  def _evolve(self, population, size):
     """
     Mutator Function: Performs crossover and polynomial mutation
     :param population:Population that needs to be evolved

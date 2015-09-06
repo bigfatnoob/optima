@@ -199,17 +199,16 @@ class Node(BinaryTree):
     return pop
 
 
-  def split(self, pop):
+  def split(self, pop, cut):
     """
     Split the population at the midpoint
     :param pop:
     :return:
     """
-    mid = int(len(pop)/2)
-    self.x = pop[mid].x
+    self.x = pop[cut].x
     self.east = pop[0]
     self.west = pop[-1]
-    return pop[:mid], pop[mid:]
+    return pop[:cut], pop[cut:]
 
   def divide(self, threshold, abort = False):
     """
@@ -226,9 +225,10 @@ class Node(BinaryTree):
     n = len(self._pop)
 
     cut, _ = self.binary_chop(self._pop, n//2, None, 2*n ** 0.5, n)
+    self.abort = abort
     if not abort and n >= threshold:
       # Splitting
-      wests, easts = self.split(self._pop)
+      wests, easts = self.split(self._pop, cut)
 
       if self.west != self.east:
         if self.N > cut:
@@ -323,12 +323,6 @@ class Node(BinaryTree):
     else:
       return right_cut, right_delta
 
-
-
-
-
-
-
   def show(self):
     out = ""
     out += (self.level - 1) * settings().b4 + str(self.n) + " (" + str(id(self) % 1000)+ ") \n"
@@ -338,4 +332,13 @@ class Node(BinaryTree):
       out += self.right.show()
     return out
 
+def _test():
+  from problems.ZDT1 import ZDT1
+  o = ZDT1()
+  o.populate(100)
+  node = Node(o, Node.format(o.population), 100).divide(sqrt(o.population))
+  print(node.show())
+
+if __name__ == "__main__":
+  _test()
 

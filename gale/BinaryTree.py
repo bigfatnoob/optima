@@ -26,6 +26,26 @@ class BinaryTree:
       return None
     return [node for node in self.nodes() if node.is_leaf()]
 
+  def pruned_leaves(self):
+    """
+    Returns all the pruned leaves
+    in a tree
+    :return: Array of nodes
+    """
+    if self.nodes() is None:
+      return None
+    return [node for node in self.nodes() if node.is_leaf() and node.abort]
+
+  def nonpruned_leaves(self):
+    """
+    Returns all the pruned leaves
+    in a tree
+    :return: Array of nodes
+    """
+    if self.nodes() is None:
+      return None
+    return [node for node in self.nodes() if node.is_leaf() and not node.abort]
+
   def nodes(self, visited = None):
     """
     Returns all the nodes in a tree as an array
