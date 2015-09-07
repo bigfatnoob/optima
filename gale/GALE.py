@@ -56,7 +56,7 @@ class GALE(Algorithm):
       population, evals = self.recombine(selectees, settings().pop_size)
       total_evals += evals
       gen += 1
-
+    print("")
     return population
 
 

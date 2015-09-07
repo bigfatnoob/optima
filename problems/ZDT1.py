@@ -61,17 +61,18 @@ class ZDT1(Problem):
 
 
 def _run_once():
-  import nsga2.NSGA2 as optimizer
+  import gale.GALE as optimizer
   import random
+  algo = optimizer.GALE
   random.seed(1)
   o = ZDT1()
   o.populate(optimizer.settings().pop_size)
-  nsga2 = optimizer.NSGA2(o, gens=20)
-  goods = nsga2.run()
-  print(nsga2.convergence(goods))
-  print(nsga2.diversity(goods))
-  nsga2.solution_range(goods)
-  o.plot(goods)
+  opt = algo(o, gens=100)
+  goods = opt.run()
+  print(opt.convergence(goods))
+  print(opt.diversity(goods))
+  opt.solution_range(goods)
+  o.plot(goods, file_path="figures/"+opt.name+".png")
 
 def _run_many():
   import nsga2.NSGA2 as optimizer
@@ -81,10 +82,10 @@ def _run_many():
   for _ in range(1):
     o = ZDT1()
     o.populate(optimizer.settings().pop_size)
-    nsga2 = optimizer.NSGA2(o, gens=20)
-    goods = nsga2.run()
-    gammas.append(nsga2.convergence(goods))
-    deltas.append(nsga2.diversity(goods))
+    opt = optimizer.NSGA2(o, gens=250)
+    goods = opt.run()
+    gammas.append(opt.convergence(goods))
+    deltas.append(opt.diversity(goods))
   print(np.mean(gammas), np.var(gammas))
   print(np.mean(deltas), np.var(deltas))
 
