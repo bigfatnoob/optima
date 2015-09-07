@@ -72,7 +72,42 @@ class GALE(Algorithm):
 
 
   def _evolve(self, selected):
-    pass
+    evals = 0
+    for leaf in selected:
+      #Poles
+      east = leaf._pop[0]
+      west = leaf._pop[-1]
+      # Evaluate poles if required
+      if not east.evaluated:
+        east.evaluate(self.problem)
+        evals += 1
+      if not west.evaluated:
+        west.evaluate(self.problem)
+        evals += 1
+
+      weights = self.problem.directional_weights()
+      weighted_west = [c*w for c,w in zip(west.objectives, weights)]
+      weighted_east = [c*w for c,w in zip(east.objectives, weights)]
+      objs = self.problem.objectives
+      west_loss = loss(weighted_west, weighted_east, mins=[o.low for o in objs], maxs=[o.high for o in objs])
+      east_loss = loss(weighted_east, weighted_west, mins=[o.low for o in objs], maxs=[o.high for o in objs])
+
+      # Determine better Pole
+      if east_loss < west_loss:
+        south_pole,north_pole = east,west
+      else:
+        south_pole,north_pole = west,east
+
+      # Magnitude of the mutations
+      g = abs(south_pole.x - north_pole.x)
+
+      for row in leaf._pop:
+        # TODO - Line 115 gale_components.py
+        # clone = row.clone()
+        # clone_x = row.x
+
+
+
 
   def _recombine(self, population, mutants, total_size):
     pass

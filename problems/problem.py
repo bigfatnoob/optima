@@ -73,6 +73,22 @@ class Problem(O):
     for i, d in enumerate(self.decisions):
       d.value = decisions[i]
 
+  def directional_weights(self):
+    """
+    Method that returns an array of weights
+    based on the objective. If objective is
+    to be maximized, return 1 else return 0
+    :return:
+    """
+    weights = []
+    for obj in self.objectives:
+      # w is negative when we are maximizing that objective
+      if obj.to_minimize:
+        weights.append(1)
+      else:
+        weights.append(-1)
+    return weights
+
   def populate(self, n):
     """
     Default method to create a population

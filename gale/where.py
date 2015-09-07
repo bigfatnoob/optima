@@ -243,13 +243,7 @@ class Node(BinaryTree):
         if not self.west.evaluated:
           self.west.evaluate(self.problem)
 
-        weights = []
-        for obj in self.problem.objectives:
-          # w is negative when we are maximizing that objective
-          if obj.to_minimize:
-            weights.append(1)
-          else:
-            weights.append(-1)
+        weights = self.problem.directional_weights()
 
         weighted_west = [c*w for c,w in zip(self.west.objectives, weights)]
         weighted_east = [c*w for c,w in zip(self.east.objectives, weights)]
