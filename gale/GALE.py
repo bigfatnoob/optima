@@ -15,7 +15,8 @@ def settings():
   return O(
     pop_size        = 100,
     gens            = 250,
-    allowDomination = True
+    allowDomination = True,
+    gamma           = 0.15
   )
 
 class GALE(Algorithm):
@@ -42,6 +43,7 @@ class GALE(Algorithm):
 
     gen = 0
     while gen < self.gens:
+      say(".")
       total_evals = 0
       # SELECTION
       selectees, evals =  self.select(population)
@@ -51,8 +53,9 @@ class GALE(Algorithm):
       selectees, evals = self.evolve(selectees)
       total_evals += evals
 
-      population, evals = self.recombine(population, selectees, settings().pop_size)
+      population, evals = self.recombine(selectees, settings().pop_size)
       total_evals += evals
+      gen += 1
 
     return population
 
@@ -73,6 +76,7 @@ class GALE(Algorithm):
 
   def _evolve(self, selected):
     evals = 0
+    GAMMA = settings().gamma
     for leaf in selected:
       #Poles
       east = leaf._pop[0]
@@ -103,21 +107,53 @@ class GALE(Algorithm):
 
       for row in leaf._pop:
         # TODO - Line 115 gale_components.py
-        # clone = row.clone()
-        # clone_x = row.x
+        clone = row.clone()
+        clone_x = row.x
 
+        for dec_index in range(len(self.problem.decisions)):
+          # Few naming shorthands
+          me    = row.decisions[dec_index]
+          good  = south_pole.decisions[dec_index]
+          bad   = north_pole.decisions[dec_index]
+          dec   = self.problem.decisions[dec_index]
 
+          if    me > good: d = -1
+          elif  me < good: d = +1
+          else           : d =  0
+          row.decisions[dec_index] = min(dec.high, max(dec.low, me + me * g * d))
 
+        # Project the mutant
+        a = row.dist(self.problem, north_pole, is_obj=False)
+        b = row.dist(self.problem, south_pole, is_obj=False)
+        x = (a**2 + row.c**2 - b**2) / (2*row.c+0.00001)
+        row.x = x
 
-  def _recombine(self, population, mutants, total_size):
-    pass
+        if abs(x - clone_x) > (g * GAMMA) or not self.problem.evaluate_constraints()[0]:
+          row.decisions = clone.decisions
+          row.x = clone_x
+
+    pop = []
+    for leaf in selected:
+      for row in leaf._pop:
+        if row.evaluated:
+          row.evaluate(self.problem) # Re-evaluating
+        pop.append(row)
+
+    return pop, evals
+
+  def _recombine(self, mutants, total_size):
+    remaining = total_size - len(mutants)
+    pop = []
+    for _ in range(remaining):
+      pop.append(self.problem.generate())
+    return mutants + Node.format(pop), 0
 
 def _test():
   from problems.ZDT1 import ZDT1
   o = ZDT1()
   o.populate(100)
   gale = GALE(o)
-  gale.select(Node.format(gale.problem.population))
+  gale.run()
 
 if __name__ == "__main__":
   _test()

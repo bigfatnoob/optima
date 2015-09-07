@@ -33,15 +33,14 @@ def sqrt(pop):
   """
   return len(pop) ** 0.5
 
-class NodePoint(O):
+class NodePoint(Point):
   def __init__(self, decisions):
     """
     Create a Nodepoint for a tree
     :param decisions: Decisions for the point
     :return:
     """
-    O.__init__(self)
-    self.decisions = decisions
+    Point.__init__(self, decisions)
     self.objectives = None
     self.evaluated = False
     self.normalized = False
@@ -62,6 +61,16 @@ class NodePoint(O):
     other.c, other.x = self.c, self.x
     other.normalized = self.normalized
     return other
+
+  def clear(self):
+    self.decisions = None
+    self.objectives = None
+    self.evaluated = False
+    self.normalized = False
+    self.a = None              # Distance from East
+    self.b = None              # Distance from West
+    self.c = None              # Distance between East and West
+    self.x = None              # Projection of point on "c"
 
   def dist(self, problem, one, is_obj=True):
     """
