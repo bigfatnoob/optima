@@ -77,7 +77,6 @@ class GALE(Algorithm):
   def _evolve(self, selected):
     evals = 0
     GAMMA = settings().gamma
-    print("LEAVES : ", len(selected))
     for leaf in selected:
       #Poles
       east = leaf._pop[0]
