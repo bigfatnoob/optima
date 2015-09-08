@@ -77,6 +77,7 @@ class GALE(Algorithm):
   def _evolve(self, selected):
     evals = 0
     GAMMA = settings().gamma
+    print("LEAVES : ", len(selected))
     for leaf in selected:
       #Poles
       east = leaf._pop[0]
@@ -106,10 +107,8 @@ class GALE(Algorithm):
       g = abs(south_pole.x - north_pole.x)
 
       for row in leaf._pop:
-        # TODO - Line 115 gale_components.py
         clone = row.clone()
         clone_x = row.x
-
         for dec_index in range(len(self.problem.decisions)):
           # Few naming shorthands
           me    = row.decisions[dec_index]
@@ -120,15 +119,14 @@ class GALE(Algorithm):
           if    me > good: d = -1
           elif  me < good: d = +1
           else           : d =  0
-          row.decisions[dec_index] = min(dec.high, max(dec.low, me + me * g * d))
 
+          row.decisions[dec_index] = min(dec.high, max(dec.low, me + me * g * d))
         # Project the mutant
         a = row.dist(self.problem, north_pole, is_obj=False)
         b = row.dist(self.problem, south_pole, is_obj=False)
         x = (a**2 + row.c**2 - b**2) / (2*row.c+0.00001)
         row.x = x
-
-        if abs(x - clone_x) > (g * GAMMA) or not self.problem.evaluate_constraints()[0]:
+        if abs(x - clone_x) > (g * GAMMA) or not self.problem.evaluate_constraints(row)[0]:
           row.decisions = clone.decisions
           row.x = clone_x
 

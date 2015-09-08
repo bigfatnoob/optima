@@ -128,7 +128,7 @@ class NodePoint(Point):
         tmp = self.dist(problem, one, is_obj=False)
         if better(tmp, dist):
           dist, out = tmp, one
-    return one
+    return out
 
 
   def furthest(self, problem, pop):
@@ -195,7 +195,7 @@ class Node(BinaryTree):
     """
     one = rand_one(pop)
     self.west = one.furthest(problem, pop)
-    self.east = one.furthest(problem, pop)
+    self.east = self.west.furthest(problem, pop)
     self.c = self.west.dist(problem, self.east, is_obj=False)
     for one in pop:
       a = one.dist(problem, self.west, is_obj=False)
@@ -214,10 +214,9 @@ class Node(BinaryTree):
     :param pop:
     :return:
     """
-    # TODO - I swapped east and west from the original
     self.x = pop[cut].x
-    self.west = pop[0]
-    self.east = pop[-1]
+    self.east = pop[0]
+    self.west = pop[-1]
     return pop[:cut], pop[cut:]
 
   def divide(self, threshold, abort = False):

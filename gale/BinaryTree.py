@@ -1,11 +1,13 @@
 __author__ = 'panzer'
+from utils.lib import O
 
-class BinaryTree:
+class BinaryTree(O):
   def __init__(self):
     """
     Points to root of the tree and number of children under it
     :return:
     """
+    O.__init__(self)
     self.n = 0
     self.left = None
     self.right = None
