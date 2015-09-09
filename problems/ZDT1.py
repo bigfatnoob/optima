@@ -67,7 +67,7 @@ def _run_once():
   random.seed(1)
   o = ZDT1()
   o.populate(optimizer.settings().pop_size)
-  opt = algo(o, gens=10)
+  opt = algo(o, gens=100)
   goods = opt.run()
   print(opt.convergence(goods))
   print(opt.diversity(goods))

@@ -40,13 +40,15 @@ class GALE(Algorithm):
 
   def run(self):
     population = Node.format(self.problem.population)
-
+    best_solutions = []
     gen = 0
     while gen < self.gens:
       say(".")
       total_evals = 0
       # SELECTION
       selectees, evals =  self.select(population)
+      solutions, evals = self.get_best(selectees)
+      best_solutions += solutions
       total_evals += evals
 
       # EVOLUTION
@@ -57,7 +59,37 @@ class GALE(Algorithm):
       total_evals += evals
       gen += 1
     print("")
-    return population
+    return best_solutions
+
+  def get_best(self, non_dom_leaves):
+    """
+    Return the best row from all the
+    non dominated leaves
+    :param non_dom_leaves:
+    :return:
+    """
+    bests = []
+    evals = 0
+    for leaf in non_dom_leaves:
+      east = leaf._pop[0]
+      west = leaf._pop[-1]
+      if not east.evaluated:
+        east.evaluate(self.problem)
+        evals += 1
+      if not west.evaluated:
+        west.evaluate(self.problem)
+        evals += 1
+      weights = self.problem.directional_weights()
+      weighted_west = [c*w for c,w in zip(west.objectives, weights)]
+      weighted_east = [c*w for c,w in zip(east.objectives, weights)]
+      objs = self.problem.objectives
+      west_loss = loss(weighted_west, weighted_east, mins=[o.low for o in objs], maxs=[o.high for o in objs])
+      east_loss = loss(weighted_east, weighted_west, mins=[o.low for o in objs], maxs=[o.high for o in objs])
+      if east_loss < west_loss:
+        bests.append(east)
+      else:
+        bests.append(west)
+    return bests, evals
 
 
   def _select(self, pop):

@@ -1,3 +1,1 @@
-__author__ = 'george'
-
-from gale.where import *
+from __future__ import print_function, division
