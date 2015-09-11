@@ -207,7 +207,7 @@ class NSGA2(Algorithm):
       frontier[0].crowd_dist = float("inf")
       frontier[-1].crowd_dist = float("inf")
       for i in range(1,l-1):
-        frontier[i].crowd_dist += (frontier[i+1].objectives[m] - frontier[i-1].objectives[m])/(obj_max - obj_min)
+        frontier[i].crowd_dist += (frontier[i+1].objectives[m] - frontier[i-1].objectives[m])/(obj_max - obj_min + EPS)
     return sorted(frontier, key=lambda x:x.crowd_dist, reverse=True)
 
   def sbx_crossover(self, mom, dad, cr=0.9, eta=30):

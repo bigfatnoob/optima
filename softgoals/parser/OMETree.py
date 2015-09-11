@@ -296,6 +296,18 @@ class Parser(O):
     f.close()
 
   @staticmethod
+  def filter_nodes(nodes, node_type):
+    return [node for node in nodes if node.type == node_type]
+
+  def get_roots(self):
+    nodes = []
+    for node in self.nodes:
+      if not node.from_edges and node.to_edges:
+        nodes.append(node)
+    return nodes
+
+
+  @staticmethod
   def from_json(json_obj):
     #TODO implement method to load from json
     pass
