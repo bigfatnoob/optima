@@ -264,6 +264,53 @@ class Parser(O):
       for child in container.findall("intentions"):
         self.parse_node(child, container_id)
 
+  def get_edge(self, edge_id):
+    for edge in self.edges:
+      if edge.id == edge_id:
+        return edge
+    return None
+
+  def get_node(self, node_id):
+    for node in self.nodes:
+      if node.id == node_id:
+        return node
+    return None
+
+  def get_other_end(self, edge_id, one_end):
+    for edge in self.edges:
+      if edge.id == edge_id:
+        if edge.source == one_end:
+          return edge.target
+        elif edge.target == one_end:
+          return edge.source
+        else:
+          return None
+
+  def remove_actors(self):
+    from copy import copy
+
+    def remove_actor(actor):
+      edge_ids = []
+      if actor.from_edges : edge_ids+= actor.from_edges
+      if actor.to_edges   : edge_ids+= actor.to_edges
+      for edge_id in edge_ids:
+        other_end = self.get_node(self.get_other_end(edge_id, actor.id))
+        # Remove edges from "from" and "to" of other end
+        if other_end:
+          if other_end.from_edges and edge_id in other_end.from_edges:
+            other_end.from_edges.remove(edge_id)
+          if other_end.to_edges and edge_id in other_end.to_edges:
+            other_end.to_edges.remove(edge_id)
+        self.edges.remove(self.get_edge(edge_id))
+      self.nodes.remove(actor)
+
+    clones = copy(self.nodes)
+    for node in clones:
+      if node.type in ["agent", "role"]:
+        remove_actor(node)
+
+
+
   def dump_json(self, filepath = None):
     if filepath:
       f = open(filepath, 'w')
@@ -302,10 +349,11 @@ class Parser(O):
   def get_roots(self):
     nodes = []
     for node in self.nodes:
-      if not node.from_edges and node.to_edges:
-        nodes.append(node)
+      if node.type in ['task', 'resource']:
+        # We assume that decisions are either tasks or resources
+        if not node.from_edges:
+          nodes.append(node)
     return nodes
-
 
   @staticmethod
   def from_json(json_obj):
