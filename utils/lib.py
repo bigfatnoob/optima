@@ -14,7 +14,7 @@ class O():
   def __repr__(i)   :
     show=[':%s %s' % (k,i.has()[k])
       for k in sorted(i.has().keys() )
-      if k[0] is not "#"]
+      if k[0] is not "_"]
     txt = ' '.join(show)
     if len(txt) > 60:
       show=map(lambda x: '\t'+x+'\n',show)

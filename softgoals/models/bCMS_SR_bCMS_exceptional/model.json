@@ -29,20 +29,6 @@
             "value": "help"
         }, 
         {
-            "id": "_N7aRwNK5EeGgRv0sG0abZw", 
-            "source": "_MV2pMNK5EeGgRv0sG0abZw", 
-            "target": "_7ajUwNKvEeGgRv0sG0abZw", 
-            "type": "dependency", 
-            "value": "dependency"
-        }, 
-        {
-            "id": "_8v1T4NZYEeG9iL_nt8ZkDA", 
-            "source": "_6fKRwNZYEeG9iL_nt8ZkDA", 
-            "target": "_7ajUwNKvEeGgRv0sG0abZw", 
-            "type": "dependency", 
-            "value": "dependency"
-        }, 
-        {
             "id": "_Z_OhkNK8EeGgRv0sG0abZw", 
             "source": "_FQn7INZXEeGzpOouTOx93A", 
             "target": "_NLyrUNK8EeGgRv0sG0abZw", 
@@ -104,13 +90,6 @@
             "target": "_pOuOwNK1EeGgRv0sG0abZw", 
             "type": "contribution", 
             "value": "help"
-        }, 
-        {
-            "id": "_VP3W0NK5EeGgRv0sG0abZw", 
-            "source": "_zCXP4NKxEeGgRv0sG0abZw", 
-            "target": "_Uogb4NK5EeGgRv0sG0abZw", 
-            "type": "dependency", 
-            "value": "dependency"
         }, 
         {
             "id": "_5hkoINZYEeG9iL_nt8ZkDA", 
@@ -232,13 +211,6 @@
             "value": "and"
         }, 
         {
-            "id": "_BVf6INK5EeGgRv0sG0abZw", 
-            "source": "_-zOxsNK4EeGgRv0sG0abZw", 
-            "target": "_7ajUwNKvEeGgRv0sG0abZw", 
-            "type": "dependency", 
-            "value": "dependency"
-        }, 
-        {
             "id": "_KBiIENK3EeGgRv0sG0abZw", 
             "source": "_80KkUNK1EeGgRv0sG0abZw", 
             "target": "_pOuOwNK1EeGgRv0sG0abZw", 
@@ -281,13 +253,6 @@
             "value": "and"
         }, 
         {
-            "id": "_9o3NoNZYEeG9iL_nt8ZkDA", 
-            "source": "_7ajUwNKvEeGgRv0sG0abZw", 
-            "target": "_6e2vwNZYEeG9iL_nt8ZkDA", 
-            "type": "dependency", 
-            "value": "dependency"
-        }, 
-        {
             "id": "_-udjwNZYEeG9iL_nt8ZkDA", 
             "source": "_oTtN8dZYEeG9iL_nt8ZkDA", 
             "target": "_6fKRwNZYEeG9iL_nt8ZkDA", 
@@ -302,13 +267,6 @@
             "value": "help"
         }, 
         {
-            "id": "_agEsMNK5EeGgRv0sG0abZw", 
-            "source": "_ZEUf4NK5EeGgRv0sG0abZw", 
-            "target": "_zCXP4NKxEeGgRv0sG0abZw", 
-            "type": "dependency", 
-            "value": "dependency"
-        }, 
-        {
             "id": "_a9zKANK5EeGgRv0sG0abZw", 
             "source": "_97HTYNK3EeGgRv0sG0abZw", 
             "target": "_ZEUf4NK5EeGgRv0sG0abZw", 
@@ -321,13 +279,6 @@
             "target": "_pOuOwNK1EeGgRv0sG0abZw", 
             "type": "contribution", 
             "value": "help"
-        }, 
-        {
-            "id": "_I3zN8NK5EeGgRv0sG0abZw", 
-            "source": "_FfWrcNK5EeGgRv0sG0abZw", 
-            "target": "_7ajUwNKvEeGgRv0sG0abZw", 
-            "type": "dependency", 
-            "value": "dependency"
         }, 
         {
             "id": "_6CIPoNK3EeGgRv0sG0abZw", 
@@ -345,15 +296,6 @@
         }
     ], 
     "nodes": [
-        {
-            "container": null, 
-            "from_edges": [], 
-            "id": "_wHtnMNKyEeGgRv0sG0abZw", 
-            "name": "Government Agency", 
-            "to_edges": [], 
-            "type": "agent", 
-            "value": null
-        }, 
         {
             "container": "_xoTQsdZWEeGzpOouTOx93A", 
             "from_edges": [
@@ -376,9 +318,7 @@
             ], 
             "id": "_6fKRwNZYEeG9iL_nt8ZkDA", 
             "name": "Timeout", 
-            "to_edges": [
-                "_8v1T4NZYEeG9iL_nt8ZkDA"
-            ], 
+            "to_edges": [], 
             "type": "resource", 
             "value": null
         }, 
@@ -399,15 +339,6 @@
             "value": null
         }, 
         {
-            "container": null, 
-            "from_edges": [], 
-            "id": "_0ngMQNKyEeGgRv0sG0abZw", 
-            "name": "Communication Compromiser", 
-            "to_edges": [], 
-            "type": "role", 
-            "value": null
-        }, 
-        {
             "container": "_xoTQsdZWEeGzpOouTOx93A", 
             "from_edges": [
                 "_o_mgENZXEeGzpOouTOx93A"
@@ -419,22 +350,6 @@
                 "_X0JxINK8EeGgRv0sG0abZw"
             ], 
             "type": "goal", 
-            "value": null
-        }, 
-        {
-            "container": null, 
-            "from_edges": [
-                "_BVf6INK5EeGgRv0sG0abZw", 
-                "_I3zN8NK5EeGgRv0sG0abZw", 
-                "_N7aRwNK5EeGgRv0sG0abZw", 
-                "_8v1T4NZYEeG9iL_nt8ZkDA"
-            ], 
-            "id": "_7ajUwNKvEeGgRv0sG0abZw", 
-            "name": "Police Station Coordinator (PSC)", 
-            "to_edges": [
-                "_9o3NoNZYEeG9iL_nt8ZkDA"
-            ], 
-            "type": "role", 
             "value": null
         }, 
         {
@@ -488,15 +403,6 @@
             "value": null
         }, 
         {
-            "container": null, 
-            "from_edges": [], 
-            "id": "_2i1X4NKvEeGgRv0sG0abZw", 
-            "name": "Fire Station Coordinator (FSC)", 
-            "to_edges": [], 
-            "type": "role", 
-            "value": null
-        }, 
-        {
             "container": "_2i1X4NKvEeGgRv0sG0abZw", 
             "from_edges": [
                 "_BJTtsNK4EeGgRv0sG0abZw"
@@ -525,9 +431,7 @@
         }, 
         {
             "container": null, 
-            "from_edges": [
-                "_VP3W0NK5EeGgRv0sG0abZw"
-            ], 
+            "from_edges": [], 
             "id": "_Uogb4NK5EeGgRv0sG0abZw", 
             "name": "Updates", 
             "to_edges": [
@@ -548,24 +452,6 @@
             "value": null
         }, 
         {
-            "container": null, 
-            "from_edges": [], 
-            "id": "_xoTQsdZWEeGzpOouTOx93A", 
-            "name": "bCMS", 
-            "to_edges": [], 
-            "type": "agent", 
-            "value": null
-        }, 
-        {
-            "container": null, 
-            "from_edges": [], 
-            "id": "_H6iDgNKwEeGgRv0sG0abZw", 
-            "name": "Coordinators", 
-            "to_edges": [], 
-            "type": "role", 
-            "value": null
-        }, 
-        {
             "container": "_2i1X4NKvEeGgRv0sG0abZw", 
             "from_edges": [], 
             "id": "_80KkUNK1EeGgRv0sG0abZw", 
@@ -574,15 +460,6 @@
                 "_KBiIENK3EeGgRv0sG0abZw"
             ], 
             "type": "softgoal", 
-            "value": null
-        }, 
-        {
-            "container": null, 
-            "from_edges": [], 
-            "id": "_bL04kNKxEeGgRv0sG0abZw", 
-            "name": "Police Station Database", 
-            "to_edges": [], 
-            "type": "agent", 
             "value": null
         }, 
         {
@@ -609,37 +486,6 @@
                 "_VR1lYNK8EeGgRv0sG0abZw"
             ], 
             "type": "resource", 
-            "value": null
-        }, 
-        {
-            "container": null, 
-            "from_edges": [], 
-            "id": "__KjwwNKxEeGgRv0sG0abZw", 
-            "name": "Victim", 
-            "to_edges": [], 
-            "type": "role", 
-            "value": null
-        }, 
-        {
-            "container": null, 
-            "from_edges": [
-                "_agEsMNK5EeGgRv0sG0abZw"
-            ], 
-            "id": "_zCXP4NKxEeGgRv0sG0abZw", 
-            "name": "Fireman", 
-            "to_edges": [
-                "_VP3W0NK5EeGgRv0sG0abZw"
-            ], 
-            "type": "role", 
-            "value": null
-        }, 
-        {
-            "container": null, 
-            "from_edges": [], 
-            "id": "_6PTNINKwEeGgRv0sG0abZw", 
-            "name": "Fire Station", 
-            "to_edges": [], 
-            "type": "agent", 
             "value": null
         }, 
         {
@@ -675,9 +521,7 @@
             ], 
             "id": "_FfWrcNK5EeGgRv0sG0abZw", 
             "name": "Keep up to date on nature of crisis and deployed resources", 
-            "to_edges": [
-                "_I3zN8NK5EeGgRv0sG0abZw"
-            ], 
+            "to_edges": [], 
             "type": "goal", 
             "value": null
         }, 
@@ -690,15 +534,6 @@
                 "_LNBDwNK3EeGgRv0sG0abZw"
             ], 
             "type": "softgoal", 
-            "value": null
-        }, 
-        {
-            "container": null, 
-            "from_edges": [], 
-            "id": "_8nKcYNKwEeGgRv0sG0abZw", 
-            "name": "Police Station", 
-            "to_edges": [], 
-            "type": "agent", 
             "value": null
         }, 
         {
@@ -774,15 +609,6 @@
             "value": null
         }, 
         {
-            "container": null, 
-            "from_edges": [], 
-            "id": "_SgtikNKxEeGgRv0sG0abZw", 
-            "name": "Fire Station Database", 
-            "to_edges": [], 
-            "type": "agent", 
-            "value": null
-        }, 
-        {
             "container": "_2i1X4NKvEeGgRv0sG0abZw", 
             "from_edges": [], 
             "id": "_FExIkNK2EeGgRv0sG0abZw", 
@@ -822,15 +648,6 @@
             "value": null
         }, 
         {
-            "container": null, 
-            "from_edges": [], 
-            "id": "_-aAvgNKvEeGgRv0sG0abZw", 
-            "name": "Police Personnel", 
-            "to_edges": [], 
-            "type": "role", 
-            "value": null
-        }, 
-        {
             "container": "_2i1X4NKvEeGgRv0sG0abZw", 
             "from_edges": [], 
             "id": "_v9JOkNK1EeGgRv0sG0abZw", 
@@ -839,15 +656,6 @@
                 "_KvrngNK3EeGgRv0sG0abZw"
             ], 
             "type": "softgoal", 
-            "value": null
-        }, 
-        {
-            "container": null, 
-            "from_edges": [], 
-            "id": "_BGGiUNKwEeGgRv0sG0abZw", 
-            "name": "Fire Personnel", 
-            "to_edges": [], 
-            "type": "role", 
             "value": null
         }, 
         {
@@ -891,9 +699,7 @@
             ], 
             "id": "_ZEUf4NK5EeGgRv0sG0abZw", 
             "name": "Updated Information and Instructions", 
-            "to_edges": [
-                "_agEsMNK5EeGgRv0sG0abZw"
-            ], 
+            "to_edges": [], 
             "type": "resource", 
             "value": null
         }, 
@@ -967,17 +773,13 @@
             ], 
             "id": "_-zOxsNK4EeGgRv0sG0abZw", 
             "name": "Introduction", 
-            "to_edges": [
-                "_BVf6INK5EeGgRv0sG0abZw"
-            ], 
+            "to_edges": [], 
             "type": "task", 
             "value": null
         }, 
         {
             "container": null, 
-            "from_edges": [
-                "_9o3NoNZYEeG9iL_nt8ZkDA"
-            ], 
+            "from_edges": [], 
             "id": "_6e2vwNZYEeG9iL_nt8ZkDA", 
             "name": "Timeout reason", 
             "to_edges": [
@@ -1002,41 +804,12 @@
         }, 
         {
             "container": null, 
-            "from_edges": [], 
-            "id": "_P5RJwNKyEeGgRv0sG0abZw", 
-            "name": "Police Officer (Policeman)", 
-            "to_edges": [], 
-            "type": "role", 
-            "value": null
-        }, 
-        {
-            "container": null, 
-            "from_edges": [], 
-            "id": "_CSZrcNKyEeGgRv0sG0abZw", 
-            "name": "Witnesses", 
-            "to_edges": [], 
-            "type": "role", 
-            "value": null
-        }, 
-        {
-            "container": null, 
-            "from_edges": [], 
-            "id": "_QshdkNKwEeGgRv0sG0abZw", 
-            "name": "Human Distributed Coordinator", 
-            "to_edges": [], 
-            "type": "agent", 
-            "value": null
-        }, 
-        {
-            "container": null, 
             "from_edges": [
                 "_OeAogNK5EeGgRv0sG0abZw"
             ], 
             "id": "_MV2pMNK5EeGgRv0sG0abZw", 
             "name": "Strategy for handling crisis", 
-            "to_edges": [
-                "_N7aRwNK5EeGgRv0sG0abZw"
-            ], 
+            "to_edges": [], 
             "type": "resource", 
             "value": null
         }

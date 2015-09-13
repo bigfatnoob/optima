@@ -14,6 +14,7 @@ def default_ns():
     "notation" : "http://www.eclipse.org/gmf/runtime/1.0.2/notation"
   }
 
+
 class Node(O):
   def __init__(self):
     """
@@ -36,6 +37,8 @@ class Node(O):
     self.container = None
     self.to_edges = None
     self.from_edges = None
+    self.hi = +1
+    self.lo = -1
 
   @staticmethod
   def get_type(key):
@@ -324,6 +327,7 @@ class Parser(O):
     if not os.path.exists(folder_name):
       os.makedirs(folder_name)
     self.parse()
+    self.remove_actors()
     self.dump_json(folder_name + "/model.json")
 
   def make_dummy_props(self):
@@ -333,7 +337,7 @@ class Parser(O):
     self.parse()
     goals = {}
     for node in self.nodes:
-      goals[node.id] = random.choice([0,1])
+      goals[node.id] = random.choice([-1, 1])
     props = {
       "src"   : self.src,
       "goals" : goals
@@ -342,11 +346,11 @@ class Parser(O):
     f.write(json.dumps(props, indent=4, separators=(',', ': ')))
     f.close()
 
-  @staticmethod
-  def filter_nodes(nodes, node_type):
-    return [node for node in nodes if node.type == node_type]
-
   def get_roots(self):
+    """
+    Get roots of the graph.
+    :return:
+    """
     nodes = []
     for node in self.nodes:
       if node.type in ['task', 'resource']:
@@ -354,6 +358,19 @@ class Parser(O):
         if not node.from_edges:
           nodes.append(node)
     return nodes
+
+  def get_nodes(self, node_type=None):
+    """
+    Get nodes of a certain type
+    :param node_type:
+    :return:
+    """
+    if isinstance(node_type, list):
+      return [node for node in self.nodes if node.type in node_type]
+    elif isinstance(node_type, str):
+      return [node for node in self.nodes if node.type in [node_type]]
+    else: return self.nodes
+
 
   @staticmethod
   def from_json(json_obj):
