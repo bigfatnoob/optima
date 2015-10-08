@@ -61,10 +61,10 @@ class ZDT1(Problem):
 
 
 def _run_once():
-  import gale.GALE as optimizer
+  import nsga2.NSGA2 as optimizer
   import random
-  algo = optimizer.GALE
-  random.seed(1)
+  algo = optimizer.NSGA2
+  random.seed(0)
   o = ZDT1()
   o.populate(optimizer.settings().pop_size)
   opt = algo(o, gens=100)
@@ -79,10 +79,10 @@ def _run_many():
   import random
   random.seed(1)
   gammas,deltas = [], []
-  for _ in range(1):
+  for _ in range(20):
     o = ZDT1()
     o.populate(optimizer.settings().pop_size)
-    opt = optimizer.NSGA2(o, gens=250)
+    opt = optimizer.NSGA2(o, gens=100)
     goods = opt.run()
     gammas.append(opt.convergence(goods))
     deltas.append(opt.diversity(goods))

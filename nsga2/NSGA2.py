@@ -4,6 +4,7 @@ import os
 sys.path.append(os.path.abspath("."))
 from utils.lib import *
 from utils.algorithm import Algorithm
+import utils.tools as tools
 
 def settings():
   """
@@ -85,6 +86,7 @@ class NSGA2(Algorithm):
     self.frontiers = []
     self.gens = gens
 
+
   def run(self):
     """
     Runner function that runs the NSGA2 optimization algorithm
@@ -100,6 +102,7 @@ class NSGA2(Algorithm):
     print("")
     return population
 
+
   def _select(self, population, is_domination = True):
     """
     Selector Function
@@ -109,17 +112,19 @@ class NSGA2(Algorithm):
     """
     kids = []
     clones = [one.clone() for one in population]
+
     for _ in range(len(clones)//2):
-      mom = self.bin_select_tournament(clones, 4, is_domination)
+      mom = tools.binary_tournament_selection(self.problem, clones, 4, is_domination)
       dad = None
       while True:
-        dad = self.bin_select_tournament(clones, 4, is_domination)
+        dad = tools.binary_tournament_selection(self.problem, clones, 4, is_domination)
         if not mom == dad: break
-      sis, bro = self.sbx_crossover(mom.decisions, dad.decisions)
-      sis = self.poly_mutate(sis)
-      bro = self.poly_mutate(bro)
+      sis, bro = tools.sbx(self.problem, mom.decisions, dad.decisions)
+      sis = tools.poly_mutate(self.problem, sis)
+      bro = tools.poly_mutate(self.problem, bro)
       kids += [NSGAPoint(sis), NSGAPoint(bro)]
     return clones + kids
+
 
   def _evolve(self, population, size):
     """
@@ -138,23 +143,6 @@ class NSGA2(Algorithm):
         break
     return pop_next
 
-  def bin_select_tournament(self, population, tourn_size, is_domination = True):
-    """
-    Select 2 individuals from the population of size tournsize
-    :param population:
-    :param tourn_size:
-    :return:
-    """
-    tourn = random.sample(population, tourn_size)
-    best = tourn[0]
-    for i in range(1, len(tourn)):
-      if is_domination:
-        if self.problem.dominates(tourn[i], best) == 1:
-          best = tourn[i]
-      else:
-        if tourn[i] > best:
-          best = tourn[i]
-    return best
 
   def fast_non_dom_sort(self, population):
     """
@@ -194,6 +182,7 @@ class NSGA2(Algorithm):
         front1 = front2
     return frontiers
 
+
   def assign_crowd_dist(self, frontier):
     """
     Crowding distance between each point in
@@ -209,82 +198,5 @@ class NSGA2(Algorithm):
       for i in range(1,l-1):
         frontier[i].crowd_dist += (frontier[i+1].objectives[m] - frontier[i-1].objectives[m])/(obj_max - obj_min + EPS)
     return sorted(frontier, key=lambda x:x.crowd_dist, reverse=True)
-
-  def sbx_crossover(self, mom, dad, cr=0.9, eta=30):
-    """
-    Simulated Binary Crossover Between Mummy And Daddy.
-    Produces Sister and Brother.
-    cr = probability of crossover
-    """
-    problem = self.problem
-    sis = [0]*len(mom)
-    bro = [0]*len(mom)
-    if random.random() > cr: return mom, dad
-
-    for i, decision in enumerate(problem.decisions):
-      if random.random() > 0.5:
-        sis[i] = mom[i]
-        bro[i] = dad[i]
-        continue
-
-      if abs(mom[i] - dad[i]) <= EPS:
-        sis[i] = mom[i]
-        bro[i] = dad[i]
-        continue
-
-      low = problem.decisions[i].low
-      up = problem.decisions[i].high
-      small = min(mom[i], dad[i])
-      large = max(mom[i], dad[i])
-      some = random.random()
-
-      #sis
-      beta = 1.0 + (2.0 * (small - low)/(large - small))
-      alpha = 2.0 - beta ** (-(eta+1.0))
-      betaq = get_betaq(some, alpha, eta)
-      sis[i] = 0.5 * ((small+large) - betaq * (large - small))
-      sis[i] = max(low, min(sis[i], up))
-
-      #bro
-      beta = 1.0 + (2.0 * (up - large)/(large - small))
-      alpha = 2.0 - beta ** (-(eta+1.0))
-      betaq = get_betaq(some, alpha, eta)
-      bro[i] = 0.5 * ((small+large) + betaq * (large - small))
-      bro[i] = max(low, min(bro[i], up))
-    return sis, bro
-
-  def poly_mutate(self, one, eta = 20):
-    """
-    Perform Polynomial Mutation on a point.
-    Mutation Rate = 1/No of Decisions in Problem
-    """
-    problem = self.problem
-    mr = 1 / len(problem.decisions)
-    mutant = [0] * len(problem.decisions)
-
-    for i, decision in enumerate(problem.decisions):
-      if random.random() < mr:
-        mutant[i] = one[i]
-        continue
-
-      low = problem.decisions[i].low
-      high = problem.decisions[i].high
-      del1 = (one[i] - low)/(high - low)
-      del2 = (high - one[i])/(high - low)
-
-      mut_pow = 1/(eta+1)
-      rand_no = random.random()
-
-      if rand_no < 0.5:
-        xy = 1 - del1
-        val = 2 * rand_no + (1-2*rand_no) * (xy ** (eta+1))
-        del_q = val ** mut_pow - 1
-      else:
-        xy = 1 - del2
-        val = 2 * (1 - rand_no) + 2*(rand_no-0.5) * (xy ** (eta+1))
-        del_q = 1 - val ** mut_pow
-      mutant[i] = max(low, min(one[i] + del_q * (high-low) , high))
-
-    return mutant
 
 
