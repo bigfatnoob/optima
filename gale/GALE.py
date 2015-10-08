@@ -151,6 +151,7 @@ class GALE(Algorithm):
           elif  me < good: d = +1
           else           : d =  0
 
+          # Mutating towards the better solution
           row.decisions[dec_index] = min(dec.high, max(dec.low, me + me * g * d))
         # Project the mutant
         a = row.dist(self.problem, north_pole, is_obj=False)

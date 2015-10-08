@@ -5,7 +5,7 @@ import numpy as np
 
 """
 No of Decisions = n = 30.
-Range of each imput = [0,1]
+Range of each input = [0,1]
 Objectives:
   f1(x) = x1
   f2(x) = g(x)(1 - (x1/g(x))**0.5 )
