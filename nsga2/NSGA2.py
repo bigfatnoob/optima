@@ -156,7 +156,7 @@ class NSGA2(Algorithm):
       one.evaluate(self.problem)
     for one, rest in loo(population):
       for two in rest:
-        domination_status = self.problem.dominates(one, two)
+        domination_status = tools.nsga_domination(self.problem, one, two)
         if domination_status == 1:
           one.dominated.append(two)
         elif domination_status == 2:
@@ -198,5 +198,7 @@ class NSGA2(Algorithm):
       for i in range(1,l-1):
         frontier[i].crowd_dist += (frontier[i+1].objectives[m] - frontier[i-1].objectives[m])/(obj_max - obj_min + EPS)
     return sorted(frontier, key=lambda x:x.crowd_dist, reverse=True)
+
+
 
 

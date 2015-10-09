@@ -68,7 +68,7 @@ def poly_mutate(problem, one, **params):
   mutant = [0] * len(problem.decisions)
 
   for i, decision in enumerate(problem.decisions):
-    if random.random() > pm:
+    if random.random() < pm:
       mutant[i] = one[i]
       continue
 
@@ -104,9 +104,47 @@ def binary_tournament_selection(problem, population, size, is_domination = True)
   best = tourn[0]
   for i in range(1, len(tourn)):
     if is_domination:
-      if problem.dominates(tourn[i], best) == 1:
+      if nsga_domination(problem, tourn[i], best) == 1:
         best = tourn[i]
     else:
-      if tourn[i] > best:
+      if problem.better(tourn[i], best) == 1:
         best = tourn[i]
   return best
+
+def nsga_domination(problem, one, two):
+    """
+    Domination is defined as follows:
+    for all objectives a in "one" and
+    all objectives b in "two"
+    every a <= b
+
+    for all objectives a in "one" and
+    all objectives b in "two"
+    at least one a < b
+
+    Check if one set of decisions ("one")
+    dominates other set of decisions ("two")
+
+    Returns:
+      0 - one and two are not better each other
+      1 - one better than two
+      2 - two better than one
+    """
+    one_status, one_offset = problem.evaluate_constraints(one.decisions)
+    two_status, two_offset = problem.evaluate_constraints(two.decisions)
+    if one_status and two_status:
+      # Return the better solution if both solutions satisfy the constraints
+      return problem.better(one, two)
+    elif one_status:
+      # Return 1, if 1 satisfies the constraints
+      return 1
+    elif two_status:
+      #Return 2, if 2 satisfies the constraints
+      return 2
+    # both fail the constraints
+    elif one_offset < two_offset:
+      # one has a lesser offset deviation
+      return 1
+    else:
+      # two has a lesser offset deviation
+      return 2

@@ -37,17 +37,17 @@ class CONSTR(Problem):
     self.ideal_objectives = None
 
   def evaluate_constraints(self, decisions):
-    status = False
+    status = True
     offset = 0
     self.constraints[0].value = decisions[1] + 9*decisions[0] - 6
     if self.constraints[0].value < 0:
       offset += abs(self.constraints[0].value)
-      status = True
+      status = False
     self.constraints[1].value = - decisions[1] + 9*decisions[0] - 1
     if self.constraints[1].value < 0:
       offset += abs(self.constraints[1].value)
-      status = True
-    return offset, status
+      status = False
+    return status, offset
 
 
   def evaluate(self, decisions):

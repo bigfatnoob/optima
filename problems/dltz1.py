@@ -18,7 +18,6 @@ class DTLZ1(Problem):
       n = DTLZ1.default_decision_count(m)
     self.decisions = [Decision("x"+str(index+1),0,1) for index in range(n)]
     self.objectives = [Objective("f"+str(index+1), True) for index in range(m)]
-    print(len(self.decisions))
 
   @staticmethod
   def default_decision_count(m):
@@ -28,10 +27,12 @@ class DTLZ1(Problem):
     m = len(self.objectives)
     def g():
       val = 0
-      for index in range(len(decisions) - DTLZ1.k, DTLZ1.k):
+      for index in range(len(decisions) - DTLZ1.k, len(decisions)):
         d = decisions[index]
         val += ((d-0.5)**2) - (cos(20*PI*(d-0.5)))
-      val = 100 * (DTLZ1.k + val)
+      val = 1 * (DTLZ1.k + val)
+      # TODO above line is a hack
+      #val = 100 * (DTLZ1.k + val)
       return val
 
     f = [0.5 * (1 + g())]*m
@@ -49,10 +50,9 @@ def _run_once():
   random.seed(0)
   o = DTLZ1(2)
   o.populate(optimizer.settings().pop_size)
-  opt = algo(o, gens=250)
+  opt = algo(o, gens=100)
   goods = opt.run()
   objs = [good.objectives for good in goods]
-  print(objs)
   opt.solution_range(goods)
   o.plot(goods)
 
