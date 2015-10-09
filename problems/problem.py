@@ -21,6 +21,7 @@ def compare(one, two, minimize=True):
 
 class Decision(O):
   def __init__(self, name, low, high):
+    O.__init__(self)
     self.name = name
     self.low = low
     self.high = high
@@ -34,6 +35,7 @@ class Decision(O):
 
 class Objective(O):
   def __init__(self, name, to_minimize=True, low=None, high=None):
+    O.__init__(self)
     self.name = name
     self.to_minimize = to_minimize
     self.low = low
@@ -45,6 +47,7 @@ class Objective(O):
 
 class Constraint(O):
   def __init__(self, name):
+    O.__init__(self)
     self.name = name
     self.value = None
     self.status = False
@@ -52,6 +55,7 @@ class Constraint(O):
 
 class Problem(O):
   def __init__(self):
+    O.__init__(self)
     self.name = ""
     self.desc = ""
     self.decisions = []
@@ -148,11 +152,14 @@ class Problem(O):
       delta += abs(i -j)
     return delta
 
-  def evaluate(self, decisions=None):
+  def evaluate(self, decisions):
     pass
 
   def get_ideal_decisions(self, count = 500):
-    pass
+    return None
+
+  def get_ideal_objectives(self, count = 500):
+    return None
 
   def evaluate_constraints(self, one):
     return False, 0
@@ -176,8 +183,8 @@ class Problem(O):
       1 - one better than two
       2 - two better than one
     """
-    one_status, one_offset = self.evaluate_constraints(one)
-    two_status, two_offset = self.evaluate_constraints(two)
+    one_status, one_offset = self.evaluate_constraints(one.decisions)
+    two_status, two_offset = self.evaluate_constraints(two.decisions)
     better = self.better(one, two)
     if not one_status and not two_offset:
       # Return the better solution if both solutions satisfy the constraints
@@ -225,12 +232,12 @@ class Problem(O):
     def get_column(matrix, index):
       return [row[index] for row in matrix]
     ideal_objectives = self.get_ideal_objectives()
-    print(ideal_objectives[0])
-    if len(ideal_objectives[0]) != 2:
-      print("Can plot only 2d graphs")
-      return
-    x,y = get_column(ideal_objectives, 0), get_column(ideal_objectives, 1)
-    plt.plot(x, y)
+    if ideal_objectives:
+      if len(ideal_objectives[0]) != 2:
+        print("Can plot only 2d graphs")
+        return
+      x,y = get_column(ideal_objectives, 0), get_column(ideal_objectives, 1)
+      plt.plot(x, y)
     if points:
      comp_objs = [point.objectives for point in points]
      c_x, c_y = get_column(comp_objs, 0), get_column(comp_objs, 1)

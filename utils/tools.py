@@ -1,4 +1,6 @@
 from __future__ import print_function, division
+import sys, os
+sys.path.append(os.path.abspath("."))
 __author__ = 'george'
 from lib import *
 

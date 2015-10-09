@@ -1,4 +1,6 @@
 __author__ = 'panzer'
+import sys, os
+sys.path.append(os.path.abspath("."))
 from utils.lib import O
 
 class BinaryTree(O):

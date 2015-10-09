@@ -179,7 +179,7 @@ class GALE(Algorithm):
     return mutants + Node.format(pop), 0
 
 def _test():
-  from problems.ZDT1 import ZDT1
+  from problems.zdt1 import ZDT1
   o = ZDT1()
   o.populate(100)
   gale = GALE(o)

@@ -1,17 +1,19 @@
 from __future__ import print_function, division
+import sys, os
+sys.path.append(os.path.abspath("."))
 from problem import *
 from math import sqrt
 import numpy as np
 
-"""
-No of Decisions = n = 30.
-Range of each input = [0,1]
-Objectives:
-  f1(x) = x1
-  f2(x) = g(x)(1 - (x1/g(x))**0.5 )
-  where g(x) = 1 + 9*(sum_(i = 2 to n) x_i)/ n-1
-"""
 class ZDT1(Problem):
+  """
+  No of Decisions = n = 30.
+  Range of each input = [0,1]
+  Objectives:
+    f1(x) = x1
+    f2(x) = g(x)(1 - (x1/g(x))**0.5 )
+    where g(x) = 1 + 9*(sum_(i = 2 to n) x_i)/ n-1
+  """
   def __init__(self):
     Problem.__init__(self)
     self.name = "ZDT1"
@@ -27,11 +29,7 @@ class ZDT1(Problem):
     self.ideal_decisions = None
     self.ideal_objectives = None
 
-  def evaluate(self, decisions = None):
-    if decisions:
-      for index, decision in enumerate(self.decisions):
-        decision.value = decisions[index]
-    decisions = [decision.value for decision in self.decisions]
+  def evaluate(self, decisions):
     g  = 1 + 9 * sum(decisions[1:]) / (len(decisions)-1)
     self.objectives[0].value = decisions[0]
     self.objectives[1].value = g * (1 - sqrt(decisions[0]/g))
@@ -61,13 +59,13 @@ class ZDT1(Problem):
 
 
 def _run_once():
-  import nsga2.NSGA2 as optimizer
+  import nsga2.nsga2 as optimizer
   import random
   algo = optimizer.NSGA2
   random.seed(0)
   o = ZDT1()
   o.populate(optimizer.settings().pop_size)
-  opt = algo(o, gens=100)
+  opt = algo(o, gens=250)
   goods = opt.run()
   print(opt.convergence(goods))
   print(opt.diversity(goods))
@@ -75,7 +73,7 @@ def _run_once():
   o.plot(goods, file_path="figures/"+opt.name+".png")
 
 def _run_many():
-  import nsga2.NSGA2 as optimizer
+  import nsga2.nsga2 as optimizer
   import random
   random.seed(1)
   gammas,deltas = [], []

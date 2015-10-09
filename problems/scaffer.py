@@ -1,4 +1,6 @@
 from __future__ import print_function, division
+import sys, os
+sys.path.append(os.path.abspath("."))
 from problem import *
 
 __author__ = 'george'
@@ -21,18 +23,14 @@ class Schaffer(Problem):
     self.ideal_decisions = None
     self.ideal_objectives = None
 
-  def evaluate(self, decisions = None):
-    if decisions:
-      for index, decision in enumerate(self.decisions):
-        decision.value = decisions[index]
-    decisions = [decision.value for decision in self.decisions]
+  def evaluate(self, decisions):
     self.objectives[0].value = decisions[0] ** 2
     self.objectives[1].value = (decisions[0] - 2) ** 2
     return [self.objectives[0].value, self.objectives[1].value]
 
 def _run_once():
   #import gale.GALE as optimizer
-  import nsga2.NSGA2 as optimizer
+  import nsga2.nsga2 as optimizer
   import random
   random.seed(1)
   o = Schaffer()
@@ -41,7 +39,7 @@ def _run_once():
   nsga2 = optimizer.NSGA2(o, 100)
   goods = nsga2.run()
   nsga2.solution_range(goods)
-  #o.plot(goods, file_path="figures/"+o.name+".png")
+  o.plot(goods, file_path="figures/"+o.name+".png")
 
 if __name__ == "__main__":
   _run_once()

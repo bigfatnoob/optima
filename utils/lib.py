@@ -1,8 +1,18 @@
 from __future__ import division, print_function
-from constants import EPS
+import sys, os
+sys.path.append(os.path.abspath("."))
 import random
 import sys
 import math
+
+PI = math.pi
+EPS = 0.000001
+
+def cos(x):
+  return math.cos(x)
+
+def sin(x):
+  return math.sin(x)
 
 """
 Default class which everything extends.

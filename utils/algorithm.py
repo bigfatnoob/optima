@@ -1,5 +1,7 @@
 from __future__ import print_function, division
 __author__ = 'panzer'
+import sys, os
+sys.path.append(os.path.abspath("."))
 import sys
 import numpy as np
 from lib import O

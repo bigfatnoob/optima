@@ -1,4 +1,6 @@
 from __future__ import print_function, division
+import sys, os
+sys.path.append(os.path.abspath("."))
 from problem import *
 from copy import deepcopy
 import numpy as np
@@ -34,13 +36,9 @@ class CONSTR(Problem):
     self.ideal_decisions = None
     self.ideal_objectives = None
 
-  def evaluate_constraints(self, decisions = None):
+  def evaluate_constraints(self, decisions):
     status = False
     offset = 0
-    if decisions:
-      for index, decision in enumerate(self.decisions):
-        decision.value = decisions[index]
-    decisions = [decision.value for decision in self.decisions]
     self.constraints[0].value = decisions[1] + 9*decisions[0] - 6
     if self.constraints[0].value < 0:
       offset += abs(self.constraints[0].value)
@@ -52,11 +50,7 @@ class CONSTR(Problem):
     return offset, status
 
 
-  def evaluate(self, decisions=None):
-    if decisions:
-      for index, decision in enumerate(self.decisions):
-        decision.value = decisions[index]
-    decisions = [decision.value for decision in self.decisions]
+  def evaluate(self, decisions):
     self.objectives[0].value = decisions[0]
     self.objectives[1].value = (1+decisions[1])/decisions[0]
     return [self.objectives[0].value, self.objectives[1].value]
@@ -94,12 +88,12 @@ class CONSTR(Problem):
     return self.ideal_objectives
 
 if __name__ == "__main__":
-  import nsga2.NSGA2 as optimizer
+  import nsga2.nsga2 as optimizer
   import random
   random.seed(1)
   o = CONSTR()
   o.populate(optimizer.settings().pop_size)
-  nsga2 = optimizer.NSGA2(o, 500)
+  nsga2 = optimizer.NSGA2(o, 100)
   goods = nsga2.run()
   print(nsga2.convergence(goods))
   print(nsga2.diversity(goods))
