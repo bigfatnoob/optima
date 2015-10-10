@@ -25,22 +25,19 @@ class DTLZ1(Problem):
 
   def evaluate(self, decisions):
     m = len(self.objectives)
-    def g():
-      val = 0
-      for index in range(len(decisions) - DTLZ1.k, len(decisions)):
-        d = decisions[index]
-        val += ((d-0.5)**2) - (cos(20*PI*(d-0.5)))
-      val = 1 * (DTLZ1.k + val)
-      # TODO above line is a hack
-      #val = 100 * (DTLZ1.k + val)
-      return val
-
-    f = [0.5 * (1 + g())]*m
-    for i in range(m):
-      for j in range(m-(i+1)):
-        f[i] *= decisions[j]
-      if i!=0:
-        f[i] *= (1-decisions[m-(i+1)])
+    n = len(decisions)
+    k = n - m + 1
+    g = 0
+    for i in range(n - k, n):
+      g += ((decisions[i] - 0.5)**2 - cos(20.0 * PI * (decisions[i] - 0.5)))
+    g = 100 * (k + g)
+    f = []
+    for i in range(0, m): f.append((1.0 + g)*0.5)
+    for i in xrange(m):
+      for j in range(0, m-(i+1)): f[i] *= decisions[j]
+      if not (i==0):
+        aux = m - (i+1)
+        f[i] *= 1 - decisions[aux]
     return f
 
 def _run_once():
@@ -50,7 +47,7 @@ def _run_once():
   random.seed(0)
   o = DTLZ1(2)
   o.populate(optimizer.settings().pop_size)
-  opt = algo(o, gens=100)
+  opt = algo(o, gens=250)
   goods = opt.run()
   objs = [good.objectives for good in goods]
   opt.solution_range(goods)

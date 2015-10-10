@@ -12,18 +12,21 @@ class Coordinate(O):
     self.pts = []
 
 
-def splits(divisions):
-  delta = 1 / divisions
-  return [i*delta for i in range(divisions)]+[1.0]
-
-def initialize(p):
-  return [[pt] for pt in splits(p)]
+def splits(dim, div, outer=True):
+  if outer:
+    start = 0.0
+    end = 1.0
+  else:
+    start = 1/(2*dim)
+    end = start + 0.5
+  delta = (end - start) / div
+  return [start] + [start + i*delta for i in range(1, div)] + [end]
 
 def valid(coord, exact = False):
   if exact:
     return abs(sum(coord) - 1) < EPS
   else:
-    return sum(coord) <= 1
+    return sum(coord) <= 1 + EPS
 
 def expand(coords, possible):
   expanded  = []
@@ -37,7 +40,7 @@ def expand(coords, possible):
   return expanded
 
 
-def reference(m, p):
+def reference(m, p, outer=True):
   """
   Create a set of reference points
   with m axes and p is the number of
@@ -46,12 +49,19 @@ def reference(m, p):
   :param p: Number of divisions
   :return:
   """
-  possible = splits(p)
+  possible = splits(m, p, outer=outer)
   coords = [[pt] for pt in possible]
   for i in range(1, m):
     coords = expand(coords, possible)
   return [coord for coord in coords if valid(coord, exact=True)]
 
+def cover(m, p_outer, p_inner=None):
+  ref = reference(m, p_outer)
+  if p_inner:
+    ref += reference(m, p_inner, outer=False)
+  return ref
+
 
 if __name__ == "__main__":
-  print(reference(3,12))
+  x = cover(8, 3, 2)
+  print(len(x))

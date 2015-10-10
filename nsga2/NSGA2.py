@@ -113,7 +113,7 @@ class NSGA2(Algorithm):
     kids = []
     clones = [one.clone() for one in population]
 
-    for _ in range(len(clones)//2):
+    for _ in range(len(clones)):
       mom = tools.binary_tournament_selection(self.problem, clones, 4, is_domination)
       dad = None
       while True:
@@ -137,11 +137,13 @@ class NSGA2(Algorithm):
     pop_next = []
     for i, front in enumerate(fronts):
       fronts[i] = self.assign_crowd_dist(front)
-      pop_next += fronts[i]
-      if len(pop_next) >= size:
-        pop_next = pop_next[:size]
+      if len(pop_next) + len(fronts[i]) >= size:
+        pop_next += sorted(fronts[i], key=lambda x:x.crowd_dist, reverse=True)[:(size - len(fronts[i]))]
         break
+      else:
+        pop_next += fronts[i]
     return pop_next
+
 
 
   def fast_non_dom_sort(self, population):
@@ -182,7 +184,6 @@ class NSGA2(Algorithm):
         front1 = front2
     return frontiers
 
-
   def assign_crowd_dist(self, frontier):
     """
     Crowding distance between each point in
@@ -191,13 +192,11 @@ class NSGA2(Algorithm):
     l = len(frontier)
     for m in range(len(self.problem.objectives)):
       frontier = sorted(frontier, key=lambda x:x.objectives[m])
-      obj_min = frontier[0].objectives[m]
-      obj_max = frontier[-1].objectives[m]
       frontier[0].crowd_dist = float("inf")
       frontier[-1].crowd_dist = float("inf")
       for i in range(1,l-1):
-        frontier[i].crowd_dist += (frontier[i+1].objectives[m] - frontier[i-1].objectives[m])/(obj_max - obj_min + EPS)
-    return sorted(frontier, key=lambda x:x.crowd_dist, reverse=True)
+        frontier[i].crowd_dist += (frontier[i+1].objectives[m] - frontier[i-1].objectives[m])
+    return frontier
 
 
 
