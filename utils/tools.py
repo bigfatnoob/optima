@@ -68,7 +68,7 @@ def poly_mutate(problem, one, **params):
   mutant = [0] * len(problem.decisions)
 
   for i, decision in enumerate(problem.decisions):
-    if random.random() < pm:
+    if random.random() > pm:
       mutant[i] = one[i]
       continue
 

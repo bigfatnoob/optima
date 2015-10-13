@@ -92,7 +92,6 @@ if __name__ == "__main__":
   import random
   random.seed(1)
   o = CONSTR()
-  o.populate(optimizer.settings().pop_size)
   nsga2 = optimizer.NSGA2(o, 100)
   goods = nsga2.run()
   print(nsga2.convergence(goods))

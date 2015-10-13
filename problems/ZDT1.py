@@ -64,7 +64,6 @@ def _run_once():
   algo = optimizer.NSGA2
   random.seed(0)
   o = ZDT1()
-  o.populate(optimizer.settings().pop_size)
   opt = algo(o, gens=250)
   goods = opt.run()
   print(opt.convergence(goods))
@@ -79,7 +78,6 @@ def _run_many():
   gammas,deltas = [], []
   for _ in range(20):
     o = ZDT1()
-    o.populate(optimizer.settings().pop_size)
     opt = optimizer.NSGA2(o, gens=100)
     goods = opt.run()
     gammas.append(opt.convergence(goods))

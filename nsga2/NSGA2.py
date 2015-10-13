@@ -6,7 +6,7 @@ from utils.lib import *
 from utils.algorithm import Algorithm
 import utils.tools as tools
 
-def settings():
+def default_settings():
   """
   Default Settings for NSGA 2
   :return: default settings
@@ -74,27 +74,29 @@ class NSGA2(Algorithm):
 
   Check References folder for the paper
   """
-  def __init__(self, problem, gens = settings().gens):
+  def __init__(self, problem, **settings):
     """
     Initialize NSGA2 algorithm
     :param problem: Instance of the problem
-    :param gens: Max number of generations
+    :param settings: Settings to be overridden
     """
     Algorithm.__init__(self, 'NSGA2',problem)
+    self.settings = default_settings().update(**settings)
     self.select = self._select
     self.evolve = self._evolve
     self.frontiers = []
-    self.gens = gens
 
 
   def run(self):
     """
     Runner function that runs the NSGA2 optimization algorithm
     """
+    if not self.problem.population:
+      self.problem.population = self.problem.populate(self.settings.pop_size)
     population = [NSGAPoint(one) for one in self.problem.population]
     pop_size = len(population)
     gens = 0
-    while gens < self.gens:
+    while gens < self.settings.gens:
       say(".")
       population = self.select(population)
       population = self.evolve(population, pop_size)
@@ -136,9 +138,9 @@ class NSGA2(Algorithm):
     fronts = self.fast_non_dom_sort(population)
     pop_next = []
     for i, front in enumerate(fronts):
-      fronts[i] = self.assign_crowd_dist(front)
       if len(pop_next) + len(fronts[i]) >= size:
-        pop_next += sorted(fronts[i], key=lambda x:x.crowd_dist, reverse=True)[:(size - len(fronts[i]))]
+        fronts[i] = self.assign_crowd_dist(front)
+        pop_next += sorted(fronts[i], key=lambda x:x.crowd_dist, reverse=True)[:(size - len(pop_next))]
         break
       else:
         pop_next += fronts[i]

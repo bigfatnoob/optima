@@ -34,7 +34,6 @@ def _run_once():
   import random
   random.seed(1)
   o = Schaffer()
-  o.populate(optimizer.settings().pop_size)
   #nsga2 = optimizer.GALE(o, 100)
   nsga2 = optimizer.NSGA2(o, 100)
   goods = nsga2.run()

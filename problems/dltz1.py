@@ -46,7 +46,6 @@ def _run_once():
   algo = optimizer.NSGA2
   random.seed(0)
   o = DTLZ1(2)
-  o.populate(optimizer.settings().pop_size)
   opt = algo(o, gens=250)
   goods = opt.run()
   objs = [good.objectives for good in goods]
