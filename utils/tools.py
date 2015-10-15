@@ -10,9 +10,10 @@ PM_ETA = 20
 
 def get_betaq(rand, alpha, eta=30):
   if rand <= (1.0/alpha):
-      return (rand * alpha) ** (1.0/(eta+1.0))
+    return (rand * alpha) ** (1.0/(eta+1.0))
+    #return (1.0/(2.0 - rand*alpha)) ** (1.0/(eta+1.0))
   else:
-      return (1.0/(2.0 - rand*alpha)) ** (1.0/(eta+1.0))
+    return (1.0/(2.0 - rand*alpha)) ** (1.0/(eta+1.0))
 
 def sbx(problem, mom, dad, **params):
   """
@@ -23,39 +24,45 @@ def sbx(problem, mom, dad, **params):
   """
   cr = params.get("cr", SBX_CR)
   eta = params.get("eta", SBX_ETA)
-  sis = [0]*len(mom)
-  bro = [0]*len(mom)
+  sis = mom[:]
+  bro = dad[:]
   if random.random() > cr: return mom, dad
   for i, decision in enumerate(problem.decisions):
     if random.random() > 0.5:
-      sis[i] = mom[i]
-      bro[i] = dad[i]
+      sis[i], bro[i] = bro[i], sis[i]
       continue
-
     if abs(mom[i] - dad[i]) <= EPS:
-      sis[i] = mom[i]
-      bro[i] = dad[i]
       continue
-
+    one = sis[i]
+    two = bro[i]
     low = problem.decisions[i].low
     up = problem.decisions[i].high
-    small = min(mom[i], dad[i])
-    large = max(mom[i], dad[i])
+    small = min(one, two)
+    large = max(one, two)
     some = random.random()
 
     #sis
     beta = 1.0 + (2.0 * (small - low)/(large - small))
-    alpha = 2.0 - beta ** (-(eta+1.0))
-    betaq = get_betaq(some, alpha, eta)
+    alpha = 2.0 - 1 / beta**(eta+1.0)
+    if some <= (1.0/alpha):
+      betaq = (some * alpha) ** (1.0/(eta+1.0))
+    else:
+      betaq = (1.0/(2.0 - some*alpha)) ** (1.0/(eta+1.0))
     sis[i] = 0.5 * ((small+large) - betaq * (large - small))
     sis[i] = max(low, min(sis[i], up))
 
     #bro
     beta = 1.0 + (2.0 * (up - large)/(large - small))
-    alpha = 2.0 - beta ** (-(eta+1.0))
-    betaq = get_betaq(some, alpha, eta)
+    alpha = 2.0 - 1 / beta**(eta+1.0)
+    if some <= (1.0/alpha):
+      betaq = (1.0/(2.0 - some*alpha)) ** (1.0/(eta+1.0))
+      #betaq = (some * alpha) ** (1.0/(eta+1.0))
+    else:
+      betaq = (1.0/(2.0 - some*alpha)) ** (1.0/(eta+1.0))
     bro[i] = 0.5 * ((small+large) + betaq * (large - small))
     bro[i] = max(low, min(bro[i], up))
+    if random.random() > 0.5:
+      sis[i], bro[i] = bro[i], sis[i]
   return sis, bro
 
 def poly_mutate(problem, one, **params):
