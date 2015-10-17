@@ -36,7 +36,6 @@ class NSGAPoint(Point):
     Represents a point in the frontier for NSGA
     :param decisions: Set of decisions
     :param problem: Instance of the problem
-    :param do_eval: Flag to check if evaluation has to be performed
     """
     Point.__init__(self, decisions, problem)
     self.rank = 0
