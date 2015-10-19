@@ -145,8 +145,6 @@ class NSGA2(Algorithm):
         pop_next += fronts[i]
     return pop_next
 
-
-
   def fast_non_dom_sort(self, population):
     """
     Fast Non Dominated Sort
@@ -167,7 +165,6 @@ class NSGA2(Algorithm):
       if one.dominating == 0:
         one.rank = 1
         front1.append(one)
-
     current_rank = 1
     while True:
       front2 = []

@@ -89,7 +89,8 @@ class NSGA3(Algorithm):
     while gens < self.settings.gens:
       say(".")
       population = self.select(population)
-      population = self.evolve(population, pop_size)
+      population = self.evolve(population)
+      exit()
       gens += 1
     print("")
     return population
@@ -115,3 +116,74 @@ class NSGA3(Algorithm):
       bro = tools.poly_mutate(self.problem, bro)
       kids += [NSGAPoint(sis), NSGAPoint(bro)]
     return clones + kids
+
+  def _evolve(self, population):
+    fronts = self.fast_non_dom_sort(population)
+    s = []
+    n = self.settings.pop_size
+    last_index = 0
+    for i, front in enumerate(fronts):
+      if len(s) + len(front) >= n: break
+      s += front
+      last_index = i
+    if len(s) == n:
+      return s
+    pop_next = []
+    for j in range(last_index):
+      pop_next += fronts[j]
+    k = n - len(pop_next)
+    ideal = self.get_ideal(population)
+    print(ideal)
+
+
+
+  def fast_non_dom_sort(self, population):
+    """
+    Fast Non Dominated Sort
+    :param - Population to sort
+    :return - List of Frontiers
+    """
+    frontiers = []
+    front1 = []
+    for one in population:
+      one.evaluate(self.problem)
+    for one, rest in loo(population):
+      for two in rest:
+        domination_status = tools.nsga_domination(self.problem, one, two)
+        if domination_status == 1:
+          one.dominated.append(two)
+        elif domination_status == 2:
+          one.dominating += 1
+      if one.dominating == 0:
+        one.rank = 1
+        front1.append(one)
+    current_rank = 1
+    while True:
+      front2 = []
+      for one in front1:
+        for two in one.dominated:
+          two.dominating -= 1
+          if two.dominating == 0:
+            two.rank =  current_rank + 1
+            front2.append(two)
+      current_rank += 1
+      if len(front2) == 0 :
+        break
+      else :
+        frontiers.append(front2)
+        front1 = front2
+    return frontiers
+
+  def get_ideal(self, population):
+    ideal = []
+    for i, obj in enumerate(self.problem.objectives):
+      f = min if obj.to_minimize else max
+      ideal.append(f([one.objectives[i] for one in population]))
+    return ideal
+
+  def get_worst(self, population):
+    worst = []
+    for i, obj in enumerate(self.problem.objectives):
+      f = max if obj.to_minimize else min
+      worst.append(f([one.objectives[i] for one in population]))
+    return worst

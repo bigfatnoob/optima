@@ -42,10 +42,11 @@ class DTLZ1(Problem):
 
 def _run_once():
   import nsga2.nsga2 as optimizer
+  import nsga3.nsga3 as optimizer
   import random
-  algo = optimizer.NSGA2
+  algo = optimizer.NSGA3
   random.seed(0)
-  o = DTLZ1(2)
+  o = DTLZ1(3)
   opt = algo(o, gens=250)
   goods = opt.run()
   objs = [good.objectives for good in goods]
