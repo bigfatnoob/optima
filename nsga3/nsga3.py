@@ -133,7 +133,8 @@ class NSGA3(Algorithm):
       pop_next += fronts[j]
     k = n - len(pop_next)
     ideal = self.get_ideal(population)
-    print(ideal)
+    extremes = self.get_extremes(population, ideal)
+    print(extremes)
 
 
 
@@ -187,3 +188,26 @@ class NSGA3(Algorithm):
       f = max if obj.to_minimize else min
       worst.append(f([one.objectives[i] for one in population]))
     return worst
+
+  def get_extremes(self, population, ideal):
+    def asf(point, index):
+      max_val = -sys.maxint
+      eps = 1e-6
+      for k, (o, idl) in enumerate(zip(point, ideal)):
+        temp = abs(o - idl)
+        if index != k:
+          temp /= eps
+        if temp > max_val:
+          max_val = temp
+      return max_val
+    extremes = []
+    for j, obj in enumerate(self.problem.objectives):
+      extreme_index = -1
+      min_val = sys.maxint
+      for i, one in enumerate(population):
+        asf_val = asf(one.objectives, j)
+        if asf_val < min_val:
+          min_val = asf_val
+          extreme_index = i
+      extremes += [population[extreme_index].objectives]
+    return extremes
