@@ -5,6 +5,8 @@ sys.path.append(os.path.abspath("."))
 from utils.lib import *
 from utils.algorithm import Algorithm
 import utils.tools as tools
+import numpy as np
+from reference import DIVISIONS, cover
 
 __author__ = 'george'
 
@@ -79,6 +81,7 @@ class NSGA3(Algorithm):
     self.select = self._select
     self.evolve = self._evolve
     self.frontiers = []
+    self._reference = None
 
   def run(self):
     if not self.problem.population:
@@ -134,9 +137,10 @@ class NSGA3(Algorithm):
     k = n - len(pop_next)
     ideal = self.get_ideal(population)
     extremes = self.get_extremes(population, ideal)
-    print(extremes)
-
-
+    worst = self.get_worst(population)
+    intercepts = self.get_intercepts(extremes, ideal, worst)
+    print(intercepts)
+    reference = self.get_reference()
 
   def fast_non_dom_sort(self, population):
     """
@@ -211,3 +215,38 @@ class NSGA3(Algorithm):
           extreme_index = i
       extremes += [population[extreme_index].objectives]
     return extremes
+
+  def get_intercepts(self, extremes, ideal, worst):
+    """
+    Get Intercepts of the extreme points on each
+    of the objective axis.
+    :param extremes: Extreme points
+    :param ideal: Ideal point
+    :param worst: Worst point
+    :return: Intercepts on each objective axis
+    """
+    norm_extremes = []
+    for extreme in extremes:
+      norm_extremes.append([e-i for e, i in zip(extreme, ideal)])
+    norm_extremes = np.array(norm_extremes)
+    intercepts = [-1] * len(self.problem.objectives)
+    if np.linalg.matrix_rank(norm_extremes) == len(norm_extremes):
+      unit = np.matrix([[1]]*len(self.problem.objectives))
+      inv_extremes = np.linalg.inv(norm_extremes)
+      intercepts_coeff = inv_extremes.dot(unit)
+      intercepts_coeff = intercepts_coeff.tolist()
+      for j in range(len(self.problem.objectives)):
+        a_j = 1/intercepts_coeff[j][0] + ideal[j]
+        if a_j > ideal[j]:
+          intercepts[j] = a_j
+      if j != len(self.problem.objectives)-1:
+        intercepts = worst
+    return intercepts
+
+  def get_reference(self):
+    if self._reference is None:
+      m = len(self.problem.objectives)
+      divs = DIVISIONS[m]
+      self._reference = cover(m, divs[0], divs[1])
+    return self._reference
+

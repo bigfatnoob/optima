@@ -4,6 +4,15 @@ sys.path.append(os.path.abspath("."))
 from utils.lib import *
 __author__ = 'george'
 
+DIVISIONS = {
+  # Objectives : [outer_divs, inner_divs]
+      3        : [        12,          0],
+      5        : [         6,          0],
+      8        : [         3,          2],
+      10       : [         3,          2],
+      15       : [         2,          1]
+}
+
 class Coordinate(O):
   id = 0
   def __init__(self):
