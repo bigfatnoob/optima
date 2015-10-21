@@ -50,6 +50,7 @@ class NSGAPoint(Point):
     self.rank = 0
     self.dominated = []
     self.dominating = 0
+    self.norm_objectives = None
 
   def clone(self):
     """
@@ -58,6 +59,7 @@ class NSGAPoint(Point):
     """
     new = NSGAPoint(self.decisions)
     new.objectives = self.objectives
+    new.norm_objectives = self.norm_objectives
     return new
 
 class NSGA3(Algorithm):
@@ -135,11 +137,9 @@ class NSGA3(Algorithm):
     for j in range(last_index):
       pop_next += fronts[j]
     k = n - len(pop_next)
-    ideal = self.get_ideal(population)
-    extremes = self.get_extremes(population, ideal)
-    worst = self.get_worst(population)
-    intercepts = self.get_intercepts(extremes, ideal, worst)
-    print(intercepts)
+    s = self.normalize(s)
+    print(s[0].objectives)
+    print(s[0].norm_objectives)
     reference = self.get_reference()
 
   def fast_non_dom_sort(self, population):
@@ -250,3 +250,13 @@ class NSGA3(Algorithm):
       self._reference = cover(m, divs[0], divs[1])
     return self._reference
 
+  def normalize(self, points):
+    ideal = self.get_ideal(points)
+    extremes = self.get_extremes(points, ideal)
+    worst = self.get_worst(points)
+    intercepts = self.get_intercepts(extremes, ideal, worst)
+    print(intercepts)
+    print(ideal)
+    for point in points:
+      point.norm_objectives=[(o-ideal[i])/(intercepts[i] - ideal[i]) for i, o in enumerate(point.objectives)]
+    return points
