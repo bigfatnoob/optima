@@ -143,7 +143,6 @@ class NSGA3(Algorithm):
     references = self.get_references()
     self.associate(s, references)
 
-
   def fast_non_dom_sort(self, population):
     """
     Fast Non Dominated Sort
@@ -248,6 +247,10 @@ class NSGA3(Algorithm):
     return intercepts
 
   def get_references(self):
+    """
+    Get reference points for problems
+    :return:
+    """
     if self._reference is None:
       m = len(self.problem.objectives)
       divs = DIVISIONS[m]
@@ -255,6 +258,11 @@ class NSGA3(Algorithm):
     return self._reference
 
   def normalize(self, points):
+    """
+    Normalize set of points
+    :param points:
+    :return:
+    """
     ideal = self.get_ideal(points)
     extremes = self.get_extremes(points, ideal)
     worst = self.get_worst(points)
@@ -281,8 +289,8 @@ class NSGA3(Algorithm):
         if dist < min_dist:
           min_dist = dist
           index = i
-        point.perpendicular = min_dist
-        point.reference_id = index
+      point.perpendicular = min_dist
+      point.reference_id = index
     return population
 
   @staticmethod
@@ -294,14 +302,15 @@ class NSGA3(Algorithm):
     :param reference: Reference to be projected on. List of float
     :return:
     """
-
     projection = 0
     reference_len = 0
     for v, r in zip(vector, reference):
       projection += v*r
       reference_len += r**2
-    reference_len == reference_len ** 0.5
+    reference_len **= 0.5
     projection = abs(projection)/reference_len
-
     normal = 0
+    for v, r in zip(vector, reference):
+      normal += (v - projection*r/reference_len)**2
+    return normal**0.5
 
