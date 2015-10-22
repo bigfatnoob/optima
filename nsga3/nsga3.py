@@ -51,6 +51,8 @@ class NSGAPoint(Point):
     self.dominated = []
     self.dominating = 0
     self.norm_objectives = None
+    self.perpendicular = None
+    self.reference_id = None
 
   def clone(self):
     """
@@ -138,9 +140,9 @@ class NSGA3(Algorithm):
       pop_next += fronts[j]
     k = n - len(pop_next)
     s = self.normalize(s)
-    print(s[0].objectives)
-    print(s[0].norm_objectives)
-    reference = self.get_reference()
+    references = self.get_references()
+    self.associate(s, references)
+
 
   def fast_non_dom_sort(self, population):
     """
@@ -241,9 +243,11 @@ class NSGA3(Algorithm):
           intercepts[j] = a_j
       if j != len(self.problem.objectives)-1:
         intercepts = worst
+    else:
+      intercepts = worst
     return intercepts
 
-  def get_reference(self):
+  def get_references(self):
     if self._reference is None:
       m = len(self.problem.objectives)
       divs = DIVISIONS[m]
@@ -255,8 +259,49 @@ class NSGA3(Algorithm):
     extremes = self.get_extremes(points, ideal)
     worst = self.get_worst(points)
     intercepts = self.get_intercepts(extremes, ideal, worst)
-    print(intercepts)
-    print(ideal)
     for point in points:
       point.norm_objectives=[(o-ideal[i])/(intercepts[i] - ideal[i]) for i, o in enumerate(point.objectives)]
     return points
+
+  @staticmethod
+  def associate(population, references):
+    """
+    Associate a set of points to a set of
+    reference vectors
+    :param population: List of NSGAPoint
+    :param references: List of reference vectors
+    :return: population with each normalized vector
+    associated with a reference vector
+    """
+    for point in population:
+      min_dist = sys.maxint
+      index = None
+      for i, reference in enumerate(references):
+        dist = NSGA3.perpendicular(point.norm_objectives, reference)
+        if dist < min_dist:
+          min_dist = dist
+          index = i
+        point.perpendicular = min_dist
+        point.reference_id = index
+    return population
+
+  @staticmethod
+  def perpendicular(vector, reference):
+    """
+    Perpendicular distance between a
+    vector and its projection on a reference
+    :param vector: Point to be projected. List of float
+    :param reference: Reference to be projected on. List of float
+    :return:
+    """
+
+    projection = 0
+    reference_len = 0
+    for v, r in zip(vector, reference):
+      projection += v*r
+      reference_len += r**2
+    reference_len == reference_len ** 0.5
+    projection = abs(projection)/reference_len
+
+    normal = 0
+
