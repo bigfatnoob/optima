@@ -163,6 +163,10 @@ def avg(lst):
   """
   return sum(lst)/float(len(lst))
 
+def shuffle(lst):
+  random.shuffle(lst)
+  return lst
+
 def loss(x1, x2, mins=None, maxs=None):
   """
   Compute Normalized difference between two vectors

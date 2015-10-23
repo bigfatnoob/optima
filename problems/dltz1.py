@@ -47,7 +47,7 @@ def _run_once():
   algo = optimizer.NSGA3
   random.seed(0)
   o = DTLZ1(3)
-  opt = algo(o, gens=250)
+  opt = algo(o)
   goods = opt.run()
   objs = [good.objectives for good in goods]
   opt.solution_range(goods)

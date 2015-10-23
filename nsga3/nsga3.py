@@ -6,6 +6,7 @@ from utils.lib import *
 from utils.algorithm import Algorithm
 import utils.tools as tools
 import numpy as np
+from copy import deepcopy
 from reference import DIVISIONS, cover
 
 __author__ = 'george'
@@ -19,8 +20,6 @@ def default_settings():
   return O(
     pop_size = 100,   # Size of Population
     gens = 250,       # Number of generations
-    p_outer = 3,      # Divisions on outer boundary
-    p_inner = None,   # Divisions on inner boundary
     cr = 1,           # Crossover rate for SBX
     nc = 30,          # eta for SBX
     nm = 20           # eta for Mutation
@@ -44,7 +43,6 @@ class NSGAPoint(Point):
     Represents a point in the frontier for NSGA
     :param decisions: Set of decisions
     :param problem: Instance of the problem
-    :param do_eval: Flag to check if evaluation has to be performed
     """
     Point.__init__(self, decisions, problem)
     self.rank = 0
@@ -91,13 +89,11 @@ class NSGA3(Algorithm):
     if not self.problem.population:
       self.problem.population = self.problem.populate(self.settings.pop_size)
     population = [NSGAPoint(one) for one in self.problem.population]
-    pop_size = len(population)
     gens = 0
     while gens < self.settings.gens:
       say(".")
       population = self.select(population)
       population = self.evolve(population)
-      exit()
       gens += 1
     print("")
     return population
@@ -130,18 +126,20 @@ class NSGA3(Algorithm):
     n = self.settings.pop_size
     last_index = 0
     for i, front in enumerate(fronts):
-      if len(s) + len(front) >= n: break
       s += front
       last_index = i
+      if len(s)>= n: break
+
     if len(s) == n:
       return s
     pop_next = []
     for j in range(last_index):
       pop_next += fronts[j]
-    k = n - len(pop_next)
     s = self.normalize(s)
     references = self.get_references()
     self.associate(s, references)
+    pop_next = self.niche(s, pop_next, references)
+    return pop_next
 
   def fast_non_dom_sort(self, population):
     """
@@ -313,4 +311,57 @@ class NSGA3(Algorithm):
     for v, r in zip(vector, reference):
       normal += (v - projection*r/reference_len)**2
     return normal**0.5
+
+  def niche(self, all_points, current_points, references):
+    """
+    Get Niche points for next generation from
+    population
+    :param all_points: Points to select from
+    :param current_points: Population
+    :param references: Reference points
+    :return:
+    """
+    n = self.settings.pop_size
+    k = n - len(current_points)
+    last_points = deepcopy(all_points[len(current_points):])
+    ref_counts = [0] * len(references)
+    ref_status = [False] * len(references)
+    for point in current_points:
+      ref_counts[point.reference_id] += 1
+
+    index = 0
+    while index < k:
+      ref_ids = shuffle(range(len(references)))
+      least = sys.maxint
+      ref_id = -1
+      for ref_index in ref_ids:
+        if not ref_status[ref_index] and ref_counts[ref_index] < least:
+          least = ref_counts[ref_index]
+          ref_id = ref_index
+      feasibles = []
+      for point in last_points:
+        if point.reference_id == ref_id:
+          feasibles.append(point)
+      if feasibles:
+        best_point = 0
+        if ref_counts[ref_id] == 0:
+          least_dist = sys.maxint
+          for point in feasibles:
+            if point.perpendicular < least_dist:
+              least_dist = point.perpendicular
+              best_point = point
+        else:
+          best_point = rand_one(feasibles)
+        current_points.append(best_point)
+        ref_counts[ref_id]+=1
+        last_points.remove(best_point)
+        index += 1
+      else:
+        ref_status[ref_id] = True
+    assert len(current_points) == self.settings.pop_size, "Oops population mismatch."
+    return current_points
+
+
+
+
 
