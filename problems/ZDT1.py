@@ -69,7 +69,7 @@ def _run_once():
   print(opt.convergence(goods))
   print(opt.diversity(goods))
   opt.solution_range(goods)
-  o.plot(goods, file_path="figures/"+opt.name+".png")
+  o.plot(goods, file_path="figures/"+opt.name+"_"+o.name+".png")
 
 def _run_many():
   import nsga2.nsga2 as optimizer

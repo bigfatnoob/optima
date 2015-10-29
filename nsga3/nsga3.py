@@ -18,8 +18,8 @@ def default_settings():
   :return: default settings
   """
   return O(
-    pop_size = 100,   # Size of Population
-    gens = 250,       # Number of generations
+    pop_size = 92,    # Size of Population
+    gens = 400,       # Number of generations
     cr = 1,           # Crossover rate for SBX
     nc = 30,          # eta for SBX
     nm = 20           # eta for Mutation
@@ -83,7 +83,6 @@ class NSGA3(Algorithm):
     self.select = self._select
     self.evolve = self._evolve
     self.frontiers = []
-    self._reference = None
 
   def run(self):
     if not self.problem.population:
@@ -95,6 +94,7 @@ class NSGA3(Algorithm):
       population = self.select(population)
       population = self.evolve(population)
       gens += 1
+      print(gens, self.IGD(population, self.get_references()))
     print("")
     return population
 
@@ -108,7 +108,7 @@ class NSGA3(Algorithm):
     kids = []
     clones = [one.clone() for one in population]
 
-    for _ in range(len(clones)):
+    for _ in range(len(clones)//2):
       mom = tools.binary_tournament_selection(self.problem, clones, 4, is_domination)
       dad = None
       while True:
@@ -122,6 +122,9 @@ class NSGA3(Algorithm):
 
   def _evolve(self, population):
     fronts = self.fast_non_dom_sort(population)
+    tot = 0
+    for f in fronts:
+      tot += len(f)
     s = []
     n = self.settings.pop_size
     last_index = 0
@@ -162,6 +165,7 @@ class NSGA3(Algorithm):
         one.rank = 1
         front1.append(one)
     current_rank = 1
+    frontiers.append(front1)
     while True:
       front2 = []
       for one in front1:

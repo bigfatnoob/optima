@@ -166,6 +166,7 @@ class NSGA2(Algorithm):
         one.rank = 1
         front1.append(one)
     current_rank = 1
+    frontiers.append(front1)
     while True:
       front2 = []
       for one in front1:

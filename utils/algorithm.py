@@ -5,6 +5,7 @@ sys.path.append(os.path.abspath("."))
 import sys
 import numpy as np
 from lib import O
+from nsga3.reference import DIVISIONS, cover
 
 class Algorithm(O):
   def __init__(self, name, problem):
@@ -20,6 +21,18 @@ class Algorithm(O):
     self.select = None
     self.evolve = None
     self.recombine = None
+    self._reference = None
+
+  def get_references(self):
+    """
+    Get reference points for problems
+    :return:
+    """
+    if self._reference is None:
+      m = len(self.problem.objectives)
+      divs = DIVISIONS[m]
+      self._reference = cover(m, divs[0], divs[1])
+    return self._reference
 
   def convergence(self, obtained):
     """
@@ -86,6 +99,17 @@ class Algorithm(O):
     d_sum = sum([abs(d_i - d_bar) for d_i in distances])
     delta = (d_f + d_l + d_sum) / (d_f + d_l + (len(predicts) - 1)*d_bar)
     return delta
+
+  def IGD(self, obtained, ideal):
+    def dist(a, b):
+      return sum([(i-j)**2 for i, j in zip(a,b)])**0.5
+    igd = 0
+    for o in obtained:
+      min_dist = sys.maxint
+      for d in ideal:
+        min_dist = min(min_dist, dist(o.objectives, d))
+      igd += min_dist
+    return igd/len(obtained)
 
   def run(self):
     pass

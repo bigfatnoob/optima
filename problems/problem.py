@@ -212,6 +212,4 @@ class Problem(O):
     if constraints:
       for row in constraints:
         plt.plot(row[0], row[1])
-    plt.xlim(0, 3)
-    plt.ylim(0, 3)
     plt.savefig(file_path)
