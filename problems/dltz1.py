@@ -47,14 +47,8 @@ def _run_once():
   algo = optimizer.NSGA2
   random.seed(0)
   o = DTLZ1(2)
-  # pt1 = Point(None)
-  # pt1.objectives = [1, 5, 3]
-  # pt2 = Point(None)
-  # pt2.objectives = [1, 2, 5]
-  # print(o.better(pt1, pt2))
   opt = algo(o)
   goods = opt.run()
-  objs = [good.objectives for good in goods]
   opt.solution_range(goods)
   o.plot(goods, file_path="figures/"+opt.name+"_"+o.name+".png");
 
