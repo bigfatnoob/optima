@@ -55,8 +55,7 @@ def sbx(problem, mom, dad, **params):
     beta = 1.0 + (2.0 * (up - large)/(large - small))
     alpha = 2.0 - 1 / beta**(eta+1.0)
     if some <= (1.0/alpha):
-      betaq = (1.0/(2.0 - some*alpha)) ** (1.0/(eta+1.0))
-      #betaq = (some * alpha) ** (1.0/(eta+1.0))
+      betaq = (some * alpha) ** (1.0/(eta+1.0))
     else:
       betaq = (1.0/(2.0 - some*alpha)) ** (1.0/(eta+1.0))
     bro[i] = 0.5 * ((small+large) + betaq * (large - small))

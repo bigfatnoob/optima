@@ -109,10 +109,10 @@ class NSGA3(Algorithm):
     clones = [one.clone() for one in population]
 
     for _ in range(len(clones)//2):
-      mom = tools.binary_tournament_selection(self.problem, clones, 4, is_domination)
+      mom = rand_one(clones)
       dad = None
       while True:
-        dad = tools.binary_tournament_selection(self.problem, clones, 4, is_domination)
+        dad = rand_one(clones)
         if not mom == dad: break
       sis, bro = tools.sbx(self.problem, mom.decisions, dad.decisions)
       sis = tools.poly_mutate(self.problem, sis)
@@ -216,7 +216,7 @@ class NSGA3(Algorithm):
         if asf_val < min_val:
           min_val = asf_val
           extreme_index = i
-      extremes += [population[extreme_index].objectives]
+      extremes += [population[extreme_index].objectives[:]]
     return extremes
 
   def get_intercepts(self, extremes, ideal, worst):
@@ -242,6 +242,8 @@ class NSGA3(Algorithm):
         a_j = 1/intercepts_coeff[j][0] + ideal[j]
         if a_j > ideal[j]:
           intercepts[j] = a_j
+        else:
+          break
       if j != len(self.problem.objectives)-1:
         intercepts = worst
     else:

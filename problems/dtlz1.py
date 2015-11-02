@@ -41,13 +41,13 @@ class DTLZ1(Problem):
     return f
 
 def _run_once():
-  import nsga2.nsga2 as optimizer
-  #import nsga3.nsga3 as optimizer
+  #import nsga2.nsga2 as optimizer
+  import nsga3.nsga3 as optimizer
   import random
-  algo = optimizer.NSGA2
+  algo = optimizer.NSGA3
   random.seed(0)
-  o = DTLZ1(2)
-  opt = algo(o)
+  o = DTLZ1(8)
+  opt = algo(o, pop_size=156, gens=750)
   goods = opt.run()
   opt.solution_range(goods)
   o.plot(goods, file_path="figures/"+opt.name+"_"+o.name+".png");
