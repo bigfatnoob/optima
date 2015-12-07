@@ -59,7 +59,7 @@ class ZDT1(Problem):
 
 
 def _run_once():
-  import nsga2.nsga2 as optimizer
+  import algorithms.nsga2.nsga2 as optimizer
   import random
   algo = optimizer.NSGA2
   random.seed(0)
@@ -72,7 +72,7 @@ def _run_once():
   o.plot(goods, file_path="figures/"+opt.name+"_"+o.name+".png")
 
 def _run_many():
-  import nsga2.nsga2 as optimizer
+  import algorithms.nsga2.nsga2 as optimizer
   import random
   random.seed(1)
   gammas,deltas = [], []

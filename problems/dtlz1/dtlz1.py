@@ -1,7 +1,7 @@
 from __future__ import print_function, division
 import sys, os
 sys.path.append(os.path.abspath("."))
-from problem import *
+from problems.problem import *
 
 __author__ = 'george'
 
@@ -40,17 +40,21 @@ class DTLZ1(Problem):
         f[i] *= 1 - decisions[aux]
     return f
 
+
+
 def _run_once():
   #import nsga2.nsga2 as optimizer
-  import nsga3.nsga3 as optimizer
+  import algorithms.nsga3.nsga3 as optimizer
   import random
   algo = optimizer.NSGA3
   random.seed(0)
-  o = DTLZ1(8)
-  opt = algo(o, pop_size=156, gens=750)
+  o = DTLZ1(15)
+  #o.populate_from_file("rough/start_pop.txt")
+  opt = algo(o, pop_size=92, gens=400)
   goods = opt.run()
   opt.solution_range(goods)
-  o.plot(goods, file_path="figures/"+opt.name+"_"+o.name+".png");
+  o.plot(goods, file_path="figures/"+opt.name+"_"+o.name+".png")
+
 
 if __name__ == "__main__":
   _run_once()

@@ -177,13 +177,3 @@ class GALE(Algorithm):
     for _ in range(remaining):
       pop.append(self.problem.generate())
     return mutants + Node.format(pop), 0
-
-def _test():
-  from problems.zdt1 import ZDT1
-  o = ZDT1()
-  o.populate(100)
-  gale = GALE(o)
-  gale.run()
-
-if __name__ == "__main__":
-  _test()

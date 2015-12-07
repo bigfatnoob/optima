@@ -62,6 +62,7 @@ class NSGAPoint(Point):
     new.norm_objectives = self.norm_objectives
     return new
 
+
 class NSGA3(Algorithm):
   """
   An improved version of NSGA 2 that uses reference points to solve
@@ -89,12 +90,13 @@ class NSGA3(Algorithm):
       self.problem.population = self.problem.populate(self.settings.pop_size)
     population = [NSGAPoint(one) for one in self.problem.population]
     gens = 0
+    random.seed(0)
     while gens < self.settings.gens:
       say(".")
       population = self.select(population)
       population = self.evolve(population)
       gens += 1
-      print(gens, self.IGD(population, self.get_references()))
+      print(gens, self.IGD(population, self.problem.get_pareto_front()))
     print("")
     return population
 
@@ -108,16 +110,16 @@ class NSGA3(Algorithm):
     kids = []
     clones = [one.clone() for one in population]
 
-    for _ in range(len(clones)//2):
+    for _ in range(len(clones)):
       mom = rand_one(clones)
       dad = None
       while True:
         dad = rand_one(clones)
         if not mom == dad: break
-      sis, bro = tools.sbx(self.problem, mom.decisions, dad.decisions)
+      sis, _ = tools.sbx(self.problem, mom.decisions, dad.decisions)
       sis = tools.poly_mutate(self.problem, sis)
-      bro = tools.poly_mutate(self.problem, bro)
-      kids += [NSGAPoint(sis), NSGAPoint(bro)]
+      #bro = tools.poly_mutate(self.problem, bro)
+      kids += [NSGAPoint(sis)]
     return clones + kids
 
   def _evolve(self, population):
@@ -132,7 +134,6 @@ class NSGA3(Algorithm):
       s += front
       last_index = i
       if len(s)>= n: break
-
     if len(s) == n:
       return s
     pop_next = []
@@ -272,7 +273,7 @@ class NSGA3(Algorithm):
     worst = self.get_worst(points)
     intercepts = self.get_intercepts(extremes, ideal, worst)
     for point in points:
-      point.norm_objectives=[(o-ideal[i])/(intercepts[i] - ideal[i]) for i, o in enumerate(point.objectives)]
+      point.norm_objectives=[(o-ideal[i])/(intercepts[i] - ideal[i] + 0.0000001) for i, o in enumerate(point.objectives)]
     return points
 
   @staticmethod
@@ -367,6 +368,16 @@ class NSGA3(Algorithm):
     assert len(current_points) == self.settings.pop_size, "Oops population mismatch."
     return current_points
 
+  def get_references(self):
+    """
+    Get reference points for problems
+    :return:
+    """
+    if self._reference is None:
+      m = len(self.problem.objectives)
+      divs = DIVISIONS[m]
+      self._reference = cover(m, divs[0], divs[1])
+    return self._reference
 
 
 

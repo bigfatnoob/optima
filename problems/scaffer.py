@@ -29,8 +29,8 @@ class Schaffer(Problem):
     return [self.objectives[0].value, self.objectives[1].value]
 
 def _run_once():
-  #import gale.GALE as optimizer
-  import nsga2.nsga2 as optimizer
+  #import algorithms.gale.gale as optimizer
+  import algorithms.nsga2.nsga2 as optimizer
   import random
   random.seed(1)
   o = Schaffer()

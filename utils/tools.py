@@ -33,17 +33,15 @@ def sbx(problem, mom, dad, **params):
       continue
     if abs(mom[i] - dad[i]) <= EPS:
       continue
-    one = sis[i]
-    two = bro[i]
     low = problem.decisions[i].low
     up = problem.decisions[i].high
-    small = min(one, two)
-    large = max(one, two)
+    small = min(sis[i], bro[i])
+    large = max(sis[i], bro[i])
     some = random.random()
 
     #sis
     beta = 1.0 + (2.0 * (small - low)/(large - small))
-    alpha = 2.0 - 1 / beta**(eta+1.0)
+    alpha = 2.0 - beta**(-1*(eta+1.0))
     if some <= (1.0/alpha):
       betaq = (some * alpha) ** (1.0/(eta+1.0))
     else:
@@ -53,7 +51,7 @@ def sbx(problem, mom, dad, **params):
 
     #bro
     beta = 1.0 + (2.0 * (up - large)/(large - small))
-    alpha = 2.0 - 1 / beta**(eta+1.0)
+    alpha = 2.0 - beta**(-1*(eta+1.0))
     if some <= (1.0/alpha):
       betaq = (some * alpha) ** (1.0/(eta+1.0))
     else:

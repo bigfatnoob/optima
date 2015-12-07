@@ -88,7 +88,7 @@ class CONSTR(Problem):
     return self.ideal_objectives
 
 if __name__ == "__main__":
-  import nsga2.nsga2 as optimizer
+  import algorithms.nsga2.nsga2 as optimizer
   import random
   random.seed(1)
   o = CONSTR()

@@ -213,3 +213,26 @@ class Problem(O):
       for row in constraints:
         plt.plot(row[0], row[1])
     plt.savefig(file_path)
+
+  def populate_from_file(self, file_path):
+    with open(file_path) as f:
+      content = f.readlines()
+    for line in content:
+      pts = line.strip().split(", ")
+      pts = [float(pt) for pt in pts]
+      self.population.append(pts)
+
+  def get_pareto_front(self):
+    """
+    Get the pareto frontier
+    for the problem from
+    file in
+    :param m : number of objectives
+    :return: List of lists of the pareto frontier
+    """
+    file_name = "problems/"+self.name.lower()+"/PF/"+str(len(self.objectives))+"_objectives.txt"
+    pf = []
+    with open(file_name) as f:
+      for line in f.readlines():
+        pf.append(map(float,line.replace("\n","").split(" ")))
+    return pf

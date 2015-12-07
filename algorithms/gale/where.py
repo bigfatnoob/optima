@@ -2,7 +2,7 @@ from __future__ import print_function, division
 import sys
 import os
 sys.path.append(os.path.abspath("."))
-from BinaryTree import BinaryTree
+from binary_tree import BinaryTree
 from utils.lib import *
 
 __author__ = 'george'
