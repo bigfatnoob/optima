@@ -17,7 +17,7 @@ class DTLZ1(Problem):
     if n is None:
       n = DTLZ1.default_decision_count(m)
     self.decisions = [Decision("x"+str(index+1),0,1) for index in range(n)]
-    self.objectives = [Objective("f"+str(index+1), True) for index in range(m)]
+    self.objectives = [Objective("f"+str(index+1), True, 0, 1000) for index in range(m)]
 
   @staticmethod
   def default_decision_count(m):

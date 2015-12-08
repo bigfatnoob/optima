@@ -1,20 +1,10 @@
 from __future__ import print_function, division
-import sys
-import os
+import sys, os
 sys.path.append(os.path.abspath("."))
 from utils.lib import *
 from utils.algorithm import Algorithm
 import utils.tools as tools
-
-def default_settings():
-  """
-  Default Settings for NSGA 2
-  :return: default settings
-  """
-  return O(
-    pop_size = 100,
-    gens = 250
-  )
+from configs import nsga2_settings as default_settings
 
 def loo(points):
   """
@@ -49,7 +39,7 @@ class NSGAPoint(Point):
     :return:
     """
     new = NSGAPoint(self.decisions)
-    new.objectives = self.objectives
+    new.objectives = self.objectives[:]
     return new
 
   def __gt__(self, other):
@@ -61,8 +51,8 @@ class NSGAPoint(Point):
 
 class NSGA2(Algorithm):
   """
-  Sort the first *k* *individuals* into different nondomination levels
-  using the "Fast Nondominated Sorting Approach" proposed by Deb et al.,
+  Sort the first *k* *individuals* into different non-domination levels
+  using the "Fast Non-dominated Sorting Approach" proposed by Deb et al.,
   see [Deb2002]_. This algorithm has a time complexity of :math:`O(MN^2)`,
   where :math:`M` is the number of objectives and :math:`N` the number of
   individuals.
@@ -73,7 +63,7 @@ class NSGA2(Algorithm):
 
   Check References folder for the paper
   """
-  def __init__(self, problem, **settings):
+  def __init__(self, problem, population = None, **settings):
     """
     Initialize NSGA2 algorithm
     :param problem: Instance of the problem
@@ -83,6 +73,7 @@ class NSGA2(Algorithm):
     self.settings = default_settings().update(**settings)
     self.select = self._select
     self.evolve = self._evolve
+    self.population = population
     self.frontiers = []
 
 
@@ -90,15 +81,16 @@ class NSGA2(Algorithm):
     """
     Runner function that runs the NSGA2 optimization algorithm
     """
-    if not self.problem.population:
-      self.problem.population = self.problem.populate(self.settings.pop_size)
-    population = [NSGAPoint(one) for one in self.problem.population]
+    if not self.population:
+      self.population = self.problem.populate(self.settings.pop_size)
+    population = [NSGAPoint(one) for one in self.population]
     pop_size = len(population)
     gens = 0
     while gens < self.settings.gens:
       say(".")
       population = self.select(population)
       population = self.evolve(population, pop_size)
+      print(gens, self.IGD(population, self.problem.get_pareto_front()))
       gens += 1
     print("")
     return population

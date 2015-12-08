@@ -8,22 +8,9 @@ import utils.tools as tools
 import numpy as np
 from copy import deepcopy
 from reference import DIVISIONS, cover
+from configs import nsga3_settings as default_settings
 
 __author__ = 'george'
-
-
-def default_settings():
-  """
-  Default Settings for NSGA 2
-  :return: default settings
-  """
-  return O(
-    pop_size = 92,    # Size of Population
-    gens = 400,       # Number of generations
-    cr = 1,           # Crossover rate for SBX
-    nc = 30,          # eta for SBX
-    nm = 20           # eta for Mutation
-  )
 
 def loo(points):
   """
@@ -58,8 +45,9 @@ class NSGAPoint(Point):
     :return:
     """
     new = NSGAPoint(self.decisions)
-    new.objectives = self.objectives
-    new.norm_objectives = self.norm_objectives
+    new.objectives = self.objectives[:]
+    if self.norm_objectives:
+      new.norm_objectives = self.norm_objectives[:]
     return new
 
 
@@ -68,12 +56,12 @@ class NSGA3(Algorithm):
   An improved version of NSGA 2 that uses reference points to solve
   many objective optimization problem.
   .. [Deb2012] Deb and Jain, "An Evolutionary Many-Objective Optimization
-      Algorithm Using Reference-Point-Based Nondominated Sorting Approach,
+      Algorithm Using Reference-Point-Based Non-dominated Sorting Approach,
       Part I: Solving Problems With Box Constraints"
 
   Check References folder for the paper.
   """
-  def __init__(self, problem, **settings):
+  def __init__(self, problem, population = None, **settings):
     """
     Initial NSGA3 algorithm
     :param problem: Instance of the problem
@@ -83,28 +71,28 @@ class NSGA3(Algorithm):
     self.settings = default_settings().update(**settings)
     self.select = self._select
     self.evolve = self._evolve
+    self.population = population
     self.frontiers = []
 
   def run(self):
-    if not self.problem.population:
-      self.problem.population = self.problem.populate(self.settings.pop_size)
-    population = [NSGAPoint(one) for one in self.problem.population]
+    if not self.population:
+      self.population = self.problem.populate(self.settings.pop_size)
+    population = [NSGAPoint(one) for one in self.population]
     gens = 0
     random.seed(0)
     while gens < self.settings.gens:
       say(".")
       population = self.select(population)
       population = self.evolve(population)
-      gens += 1
       print(gens, self.IGD(population, self.problem.get_pareto_front()))
+      gens += 1
     print("")
     return population
 
-  def _select(self, population, is_domination = True):
+  def _select(self, population):
     """
     Selector Function
     :param population: Population
-    :param is_domination: Boolean parameter that decides
     :return : Population and its kids
     """
     kids = []
@@ -239,6 +227,7 @@ class NSGA3(Algorithm):
       inv_extremes = np.linalg.inv(norm_extremes)
       intercepts_coeff = inv_extremes.dot(unit)
       intercepts_coeff = intercepts_coeff.tolist()
+      j = -1
       for j in range(len(self.problem.objectives)):
         a_j = 1/intercepts_coeff[j][0] + ideal[j]
         if a_j > ideal[j]:
@@ -250,17 +239,6 @@ class NSGA3(Algorithm):
     else:
       intercepts = worst
     return intercepts
-
-  def get_references(self):
-    """
-    Get reference points for problems
-    :return:
-    """
-    if self._reference is None:
-      m = len(self.problem.objectives)
-      divs = DIVISIONS[m]
-      self._reference = cover(m, divs[0], divs[1])
-    return self._reference
 
   def normalize(self, points):
     """

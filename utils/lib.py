@@ -186,7 +186,7 @@ def loss(x1, x2, mins=None, maxs=None):
 
 
 class Point(O):
-
+  id = 0
   def __init__(self, decisions, problem=None):
     """
     Represents a point in the frontier for NSGA
@@ -195,7 +195,9 @@ class Point(O):
     :param do_eval: Flag to check if evaluation has to be performed
     """
     O.__init__(self)
-    self.decisions = decisions
+    Point.id += 1
+    self.id = Point.id
+    self.decisions = decisions[:]
     if problem:
       self.objectives = problem.evaluate(decisions)
     else:
@@ -207,7 +209,7 @@ class Point(O):
     :return:
     """
     new = Point(self.decisions)
-    new.objectives = self.objectives
+    new.objectives = self.objectives[:]
     return new
 
   def evaluate(self, problem):
@@ -220,3 +222,6 @@ class Point(O):
 
   def __eq__(self, other):
     return self.decisions == other.decisions
+
+  def __hash__(self):
+    return hash(frozenset(self.decisions))

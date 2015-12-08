@@ -4,20 +4,10 @@ sys.path.append(os.path.abspath("."))
 from utils.lib import *
 from utils.algorithm import Algorithm
 from where import Node, sqrt
+from configs import gale_settings as default_settings
 
 __author__ = 'panzer'
 
-def settings():
-  """
-  Default Settings for NSGA 3
-  :return: default settings
-  """
-  return O(
-    pop_size        = 100,
-    gens            = 250,
-    allowDomination = True,
-    gamma           = 0.15
-  )
 
 class GALE(Algorithm):
   """
@@ -26,7 +16,7 @@ class GALE(Algorithm):
 
   Check References folder for the paper
   """
-  def __init__(self, problem, gens=settings().gens):
+  def __init__(self, problem, population = None, **settings):
     """
     Initialize GALE algorithm
     :param problem: Instance of the problem
@@ -36,13 +26,16 @@ class GALE(Algorithm):
     self.select = self._select
     self.evolve = self._evolve
     self.recombine = self._recombine
-    self.gens = gens
+    self.population = population
+    self.settings = default_settings().update(**settings)
 
   def run(self):
-    population = Node.format(self.problem.population)
+    if not self.population:
+      self.population = self.problem.populate(self.settings.pop_size)
+    population = Node.format(self.population)
     best_solutions = []
     gen = 0
-    while gen < self.gens:
+    while gen < self.settings.gens:
       say(".")
       total_evals = 0
       # SELECTION
@@ -55,7 +48,7 @@ class GALE(Algorithm):
       selectees, evals = self.evolve(selectees)
       total_evals += evals
 
-      population, evals = self.recombine(selectees, settings().pop_size)
+      population, evals = self.recombine(selectees, self.settings.pop_size)
       total_evals += evals
       gen += 1
     print("")
@@ -71,8 +64,8 @@ class GALE(Algorithm):
     bests = []
     evals = 0
     for leaf in non_dom_leaves:
-      east = leaf._pop[0]
-      west = leaf._pop[-1]
+      east = leaf.get_pop()[0]
+      west = leaf.get_pop()[-1]
       if not east.evaluated:
         east.evaluate(self.problem)
         evals += 1
@@ -93,14 +86,14 @@ class GALE(Algorithm):
 
 
   def _select(self, pop):
-    node = Node(self.problem, pop, settings().pop_size).divide(sqrt(pop))
+    node = Node(self.problem, pop, self.settings.pop_size).divide(sqrt(pop))
     non_dom_leafs = node.nonpruned_leaves()
     all_leafs = node.leaves()
 
     # Counting number of evals
     evals = 0
     for leaf in all_leafs:
-      for row in leaf._pop:
+      for row in leaf.get_pop():
         if row.evaluated:
           evals+=1
     return non_dom_leafs, evals
@@ -108,11 +101,11 @@ class GALE(Algorithm):
 
   def _evolve(self, selected):
     evals = 0
-    GAMMA = settings().gamma
+    gamma = self.settings.gamma
     for leaf in selected:
       #Poles
-      east = leaf._pop[0]
-      west = leaf._pop[-1]
+      east = leaf.get_pop()[0]
+      west = leaf.get_pop()[-1]
       # Evaluate poles if required
       if not east.evaluated:
         east.evaluate(self.problem)
@@ -137,14 +130,14 @@ class GALE(Algorithm):
       # Magnitude of the mutations
       g = abs(south_pole.x - north_pole.x)
 
-      for row in leaf._pop:
+      for row in leaf.get_pop():
         clone = row.clone()
         clone_x = row.x
         for dec_index in range(len(self.problem.decisions)):
           # Few naming shorthands
           me    = row.decisions[dec_index]
           good  = south_pole.decisions[dec_index]
-          bad   = north_pole.decisions[dec_index]
+          #bad   = north_pole.decisions[dec_index]
           dec   = self.problem.decisions[dec_index]
 
           if    me > good: d = -1
@@ -158,13 +151,13 @@ class GALE(Algorithm):
         b = row.dist(self.problem, south_pole, is_obj=False)
         x = (a**2 + row.c**2 - b**2) / (2*row.c+0.00001)
         row.x = x
-        if abs(x - clone_x) > (g * GAMMA) or not self.problem.evaluate_constraints(row)[0]:
+        if abs(x - clone_x) > (g * gamma) or not self.problem.evaluate_constraints(row)[0]:
           row.decisions = clone.decisions
           row.x = clone_x
 
     pop = []
     for leaf in selected:
-      for row in leaf._pop:
+      for row in leaf.get_pop():
         if row.evaluated:
           row.evaluate(self.problem) # Re-evaluating
         pop.append(row)

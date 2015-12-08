@@ -32,6 +32,9 @@ class Decision(O):
   def deNorm(self, val):
     return deNorm(val, self.low, self.high)
 
+  def trim(self, val):
+    return max(self.low, min(self.high, val))
+
 
 class Objective(O):
   def __init__(self, name, to_minimize=True, low=None, high=None):
@@ -98,10 +101,10 @@ class Problem(O):
     Default method to create a population
     :param n - Size of population
     """
-    self.population = []
+    population = []
     for _ in range(n):
-      self.population.append(self.generate())
-    return self.population
+      population.append(self.generate())
+    return population
 
   def norm(self, one, is_obj = True):
     """
@@ -172,7 +175,38 @@ class Problem(O):
     :param two:
     :return:
     """
-    #TODO evaluate better function
+    obj1 = one.objectives
+    obj2 = two.objectives
+    one_at_least_once = False
+    two_at_least_once = False
+    for index, (a, b) in enumerate(zip(obj1, obj2)):
+      status = compare(a, b, self.objectives[index].to_minimize)
+      if status == -1:
+        #obj2[i] better than obj1[i]
+        two_at_least_once = True
+      elif status == 1:
+        #obj1[i] better than obj2[i]
+        one_at_least_once = True
+      if one_at_least_once and two_at_least_once:
+        #neither dominates each other
+        return 0
+    if one_at_least_once:
+      return 1
+    elif two_at_least_once:
+      return 2
+    else:
+      return 0
+
+  def binary_dominates(self, one, two):
+    """
+    Check if one dominates two
+    :param one: Point one
+    :param two: Point two
+    :return:
+    1 if one dominates two
+    2 if two dominates one
+    0 if one and two are non-dominated
+    """
     obj1 = one.objectives
     obj2 = two.objectives
     one_at_least_once = False

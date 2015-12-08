@@ -185,6 +185,9 @@ class Node(BinaryTree):
     self.east, self.west, self.c, self.x = None, None, None, None
     self.abort = False
 
+  def get_pop(self):
+    return self._pop
+
 
   def fastmap(self, problem, pop):
     """
@@ -204,7 +207,7 @@ class Node(BinaryTree):
       one.c = self.c
       one.a = a
       one.b = b
-    pop = sorted(pop, key=lambda one: one.x)
+    pop = sorted(pop, key=lambda row:row.x)
     return pop
 
 
@@ -260,10 +263,10 @@ class Node(BinaryTree):
         west_loss = loss(weighted_west, weighted_east, mins=[o.low for o in objs], maxs=[o.high for o in objs])
         east_loss = loss(weighted_east, weighted_west, mins=[o.low for o in objs], maxs=[o.high for o in objs])
 
-        EPSILON = 1.0
-        if west_loss < EPSILON * east_loss:
+        epsilon = 1.0
+        if west_loss < epsilon * east_loss:
           east_abort = True
-        if east_loss < EPSILON * west_loss:
+        if east_loss < epsilon * west_loss:
           west_abort = True
 
         self.left = Node(self.problem, afew(wests), self.total_size, parent=self, level=self.level+1, n=little_n)\
