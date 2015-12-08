@@ -258,7 +258,7 @@ class NSGA3(Algorithm):
           norm_objectives.append((o-ideal[i])/(intercepts[i] - ideal[i] + 0.0000001))
         else:
           norm_objectives.append((ideal[i]-o)/(ideal[i] - intercepts[i] + 0.0000001))
-      point.norm_objectives=[(o-ideal[i])/(intercepts[i] - ideal[i] + 0.0000001) for i, o in enumerate(point.objectives)]
+      point.norm_objectives=norm_objectives
     return points
 
   @staticmethod
