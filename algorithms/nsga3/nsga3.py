@@ -228,9 +228,10 @@ class NSGA3(Algorithm):
       intercepts_coeff = inv_extremes.dot(unit)
       intercepts_coeff = intercepts_coeff.tolist()
       j = -1
-      for j in range(len(self.problem.objectives)):
+      for j, obj in enumerate(self.problem.objectives):
         a_j = 1/intercepts_coeff[j][0] + ideal[j]
-        if a_j > ideal[j]:
+        f = gt if obj.to_minimize else lt
+        if f(a_j, ideal[j]):
           intercepts[j] = a_j
         else:
           break
@@ -251,6 +252,12 @@ class NSGA3(Algorithm):
     worst = self.get_worst(points)
     intercepts = self.get_intercepts(extremes, ideal, worst)
     for point in points:
+      norm_objectives = []
+      for i, o in enumerate(point.objectives):
+        if self.problem.objectives[i].to_minimize:
+          norm_objectives.append((o-ideal[i])/(intercepts[i] - ideal[i] + 0.0000001))
+        else:
+          norm_objectives.append((ideal[i]-o)/(ideal[i] - intercepts[i] + 0.0000001))
       point.norm_objectives=[(o-ideal[i])/(intercepts[i] - ideal[i] + 0.0000001) for i, o in enumerate(point.objectives)]
     return points
 

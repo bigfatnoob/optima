@@ -20,7 +20,7 @@ problems = [
 ]
 
 algorithms = [
-  DE
+  NSGA3
 ]
 
 

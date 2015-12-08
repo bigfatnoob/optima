@@ -185,6 +185,60 @@ def loss(x1, x2, mins=None, maxs=None):
   return sum([math.exp((x2i - x1i)/o) for x1i, x2i in zip(x1,x2)])/o
 
 
+def gt(x, y):
+  """
+  True if x > y
+  :param x:
+  :param y:
+  :return: True/False
+  """
+  return x > y
+
+def gte(x, y):
+  """
+  True if x >= y
+  :param x:
+  :param y:
+  :return: True/False
+  """
+  return x >= y
+
+def lt(x, y):
+  """
+  True if x < y
+  :param x:
+  :param y:
+  :return: True/False
+  """
+  return x < y
+
+def lte(x, y):
+  """
+  True if x <= y
+  :param x:
+  :param y:
+  :return:
+  """
+  return x <= y
+
+def neq(x, y):
+  """
+  True if x != y
+  :param x:
+  :param y:
+  :return: True/False
+  """
+  return x != y
+
+def eq(x, y):
+  """
+  True if x == y
+  :param x:
+  :param y:
+  :return: True/False
+  """
+  return x == y
+
 class Point(O):
   id = 0
   def __init__(self, decisions, problem=None):
