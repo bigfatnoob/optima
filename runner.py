@@ -4,7 +4,7 @@ sys.path.append(os.path.abspath("."))
 from configs import REPEATS
 
 # Problems
-from problems.dtlz1.dtlz1 import DTLZ1
+from problems.dtlz.dtlz1 import DTLZ1
 
 # Optimizers
 from algorithms.nsga3.nsga3 import NSGA3

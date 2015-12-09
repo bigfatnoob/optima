@@ -40,21 +40,10 @@ class DTLZ1(Problem):
         f[i] *= 1 - decisions[aux]
     return f
 
-
-
-def _run_once():
-  #import nsga2.nsga2 as optimizer
-  import algorithms.nsga3.nsga3 as optimizer
-  import random
-  algo = optimizer.NSGA3
-  random.seed(0)
-  o = DTLZ1(15)
-  #o.populate_from_file("rough/start_pop.txt")
-  opt = algo(o, pop_size=92, gens=400)
-  goods = opt.run()
-  opt.solution_range(goods)
-  o.plot(goods, file_path="figures/"+opt.name+"_"+o.name+".png")
-
-
-if __name__ == "__main__":
-  _run_once()
+  def get_pareto_front(self):
+    file_name = "problems/dtlz/PF/dtlz1_"+str(len(self.objectives))+"_objectives.txt"
+    pf = []
+    with open(file_name) as f:
+      for line in f.readlines():
+        pf.append(map(float,line.replace("\n","").split(" ")))
+    return pf

@@ -264,9 +264,5 @@ class Problem(O):
     :param m : number of objectives
     :return: List of lists of the pareto frontier
     """
-    file_name = "problems/"+self.name.lower()+"/PF/"+str(len(self.objectives))+"_objectives.txt"
-    pf = []
-    with open(file_name) as f:
-      for line in f.readlines():
-        pf.append(map(float,line.replace("\n","").split(" ")))
-    return pf
+    assert False
+

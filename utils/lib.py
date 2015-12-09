@@ -4,6 +4,7 @@ sys.path.append(os.path.abspath("."))
 import random
 import sys
 import math
+import numpy as np
 
 PI = math.pi
 EPS = 0.000001
@@ -238,6 +239,28 @@ def eq(x, y):
   :return: True/False
   """
   return x == y
+
+def drange(start, end, num=100, end_point = True):
+  """
+  Decimal Range between start and end
+  :param start: Start value
+  :param end: End Value
+  :param num: Number of values
+  :param end_point: If end point has to be considered
+  :return:
+  """
+  delta =(end - start)/num
+  if end_point:
+    func = lte
+  else:
+    func = lt
+  values = []
+  temp = start
+  while func(temp, end):
+    temp = round(temp, 6)
+    values.append(temp)
+    temp += delta
+  return values
 
 class Point(O):
   id = 0
