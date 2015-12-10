@@ -167,7 +167,7 @@ class Problem(O):
   def get_ideal_objectives(self, count = 500):
     return None
 
-  def evaluate_constraints(self, one):
+  def evaluate_constraints(self, decisions):
     return True, 0
 
   def better(self, one, two):
