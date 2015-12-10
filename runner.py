@@ -5,6 +5,9 @@ from configs import REPEATS
 
 # Problems
 from problems.dtlz.dtlz1 import DTLZ1
+from problems.dtlz.dtlz2 import DTLZ2
+from problems.dtlz.dtlz3 import DTLZ3
+from problems.dtlz.dtlz4 import DTLZ4
 
 # Optimizers
 from algorithms.nsga3.nsga3 import NSGA3
@@ -15,7 +18,7 @@ from algorithms.de.de import DE
 __author__ = 'panzer'
 
 problems = [
-  DTLZ1(3),
+  DTLZ4(3),
   #DTLZ1(5)
 ]
 

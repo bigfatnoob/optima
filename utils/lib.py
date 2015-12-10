@@ -4,7 +4,6 @@ sys.path.append(os.path.abspath("."))
 import random
 import sys
 import math
-import numpy as np
 
 PI = math.pi
 EPS = 0.000001
@@ -18,7 +17,7 @@ def sin(x):
 """
 Default class which everything extends.
 """
-class O():
+class O:
   def __init__(self, **d): self.has().update(**d)
   def has(self): return self.__dict__
   def update(self, **d) : self.has().update(d); return self
@@ -36,9 +35,11 @@ class O():
 """
 An accumulator for reporting on numbers.
 """
-class N():
-  "Add/delete counts of numbers."
-  def __init__(self, inits=[]):
+class N:
+  """Add/delete counts of numbers."""
+  def __init__(self, inits=None):
+    if inits is None: inits = []
+    self.n = self.mu = self.m2 = self.cache = None
     self.zero()
     map(self.__iadd__,inits)
   def zero(self):
@@ -67,8 +68,11 @@ class N():
 
 CACHE_SIZE=128
 class Cache:
-  "Keep a random sample of stuff seen so far."
-  def __init__(self, inits=[]):
+  """
+  Keep a random sample of stuff seen so far.
+  """
+  def __init__(self, inits=None):
+    if inits is None: inits = []
     self.all, self.n, self._has = [],0,None
     map(self.__iadd__, inits)
   def __iadd__(self, x):
@@ -84,13 +88,13 @@ class Cache:
   def has(self):
     if self._has is None:
       lst  = sorted(self.all)
-      med,iqr = medianIQR(lst,ordered=True)
+      med,iqr = median_iqr(lst,ordered=True)
       self._has = O(
         median = med,      iqr = iqr,
         lo     = self.all[0], hi  = self.all[-1])
     return self._has
 
-def medianIQR(lst, ordered=False):
+def median_iqr(lst, ordered=False):
   if not ordered:
     lst = sorted(lst)
   n = len(lst)
@@ -102,11 +106,11 @@ def medianIQR(lst, ordered=False):
     p = max(0,q-1)
     return (lst[p] + lst[q]) * 0.5,iqr
 
-"""
-Method to normalize value
-between 0 and 1
-"""
 def norm(x, low, high):
+  """
+  Method to normalize value
+  between 0 and 1
+  """
   nor = (x - low)/(high - low + EPS)
   if nor > 1:
     return 1
@@ -114,17 +118,18 @@ def norm(x, low, high):
     return 0
   return nor
 
-"""
-Method to de-normalize value
-between low and high
-"""
-def deNorm(x, low, high):
-  deNor = x*(high-low) + low
-  if deNor > high:
+
+def de_norm(x, low, high):
+  """
+  Method to de-normalize value
+  between low and high
+  """
+  de_nor = x*(high-low) + low
+  if de_nor > high:
     return high
-  elif deNor < low:
+  elif de_nor < low:
     return low
-  return deNor
+  return de_nor
 
 
 def uniform(low, high):
@@ -269,7 +274,6 @@ class Point(O):
     Represents a point in the frontier for NSGA
     :param decisions: Set of decisions
     :param problem: Instance of the problem
-    :param do_eval: Flag to check if evaluation has to be performed
     """
     O.__init__(self)
     Point.id += 1

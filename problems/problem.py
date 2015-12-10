@@ -29,8 +29,8 @@ class Decision(O):
   def norm(self, val):
     return norm(val, self.low, self.high)
 
-  def deNorm(self, val):
-    return deNorm(val, self.low, self.high)
+  def de_norm(self, val):
+    return de_norm(val, self.low, self.high)
 
   def trim(self, val):
     return max(self.low, min(self.high, val))
@@ -68,6 +68,9 @@ class Problem(O):
     self.ideal_decisions = None
     self.ideal_objectives = None
     self.constraints = []
+
+  def title(self):
+    return self.name + "_" + str(len(self.decisions)) + "_" + str(len(self.objectives))
 
   def generate(self):
     while True:
@@ -231,7 +234,7 @@ class Problem(O):
 
   def plot(self, points = None, constraints = None,  file_path="figures/tmp.png"):
     def get_column(matrix, index):
-      return [row[index] for row in matrix]
+      return [line[index] for line in matrix]
     ideal_objectives = self.get_ideal_objectives()
     if ideal_objectives:
       if len(ideal_objectives[0]) != 2:
@@ -261,7 +264,6 @@ class Problem(O):
     Get the pareto frontier
     for the problem from
     file in
-    :param m : number of objectives
     :return: List of lists of the pareto frontier
     """
     assert False
