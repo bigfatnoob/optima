@@ -9,21 +9,11 @@ __author__ = 'panzer'
 class ZDT1(Problem):
   """
   No of Decisions = n = 30.
-  Range of each input = [0,1]
-  Objectives:
-    f1(x) = x1
-    f2(x) = g(x)(1 - (x1/g(x))**0.5 )
-    where g(x) = 1 + 9*(sum_(i = 2 to n) x_i)/ n-1
+  No of Objectives = m = 2
   """
   def __init__(self):
     Problem.__init__(self)
     self.name = ZDT1.__name__
-    self.desc = "No of Decisions = n = 30. \n \
-              Range of each input = [0,1] \n \
-              Objectives: \n \
-              f1(x) = x1 \n \
-              f2(x) = g(x)(1 - (x1/g(x))**0.5 ) \n \
-              where g(x) = 1 + 9*(sum_(i = 2 to n) x_i)/ n-1"
     self.decisions = [Decision("x"+str(index+1),0,1) for index in range(30)]
     self.objectives = [Objective("f1", True, 0, 100), Objective("f2", True, 0, 100)]
     self.evals = 0
