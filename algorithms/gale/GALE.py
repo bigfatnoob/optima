@@ -1,8 +1,10 @@
 from __future__ import print_function, division
-import sys, os
+import sys
+import os
+
 sys.path.append(os.path.abspath("."))
 from utils.lib import *
-from utils.algorithm import Algorithm
+from algorithms.algorithm import Algorithm
 from where import Node, sqrt
 from configs import gale_settings as default_settings
 

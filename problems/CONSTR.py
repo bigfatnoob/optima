@@ -94,8 +94,6 @@ if __name__ == "__main__":
   o = CONSTR()
   nsga2 = optimizer.NSGA2(o, 100)
   goods = nsga2.run()
-  print(nsga2.convergence(goods))
-  print(nsga2.diversity(goods))
   nsga2.solution_range(goods)
   x = np.arange(0.1,1.0,0.005)
   c1 = [6 - 9 * pt for pt in x]

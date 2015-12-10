@@ -3,7 +3,7 @@ import sys
 import os
 sys.path.append(os.path.abspath("."))
 from utils.lib import *
-from utils.algorithm import Algorithm
+from algorithms.algorithm import Algorithm
 import utils.tools as tools
 import numpy as np
 from copy import deepcopy

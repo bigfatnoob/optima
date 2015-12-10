@@ -14,7 +14,9 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-
+from __future__ import print_function,division
+import sys, os
+sys.path.append(os.path.abspath("."))
 __author__ = 'george'
 
 def gt(a, b): return a>b
@@ -289,9 +291,8 @@ class MultiList:
 
 
 if __name__ == "__main__":
-
     # Example:
     referencePoint = [2, 2, 2]
     hv = HyperVolume(referencePoint)
     front = [[1,0,1], [0,1,0]]
-    print hv.compute(front)
+    print(hv.compute(front))
