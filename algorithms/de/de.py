@@ -58,7 +58,7 @@ class DE(Algorithm):
       point.evaluate(self.problem)
       mutant = self.mutate(point, population)
       mutant.evaluate(self.problem)
-      if self.problem.binary_dominates(mutant, point) == 1:
+      if self.problem.binary_dominates(mutant.objectives, point.objectives) == 1:
         selected.remove(point)
         selected.append(mutant)
     return selected

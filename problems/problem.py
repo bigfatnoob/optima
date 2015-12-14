@@ -210,11 +210,9 @@ class Problem(O):
     2 if two dominates one
     0 if one and two are non-dominated
     """
-    obj1 = one.objectives
-    obj2 = two.objectives
     one_at_least_once = False
     two_at_least_once = False
-    for index, (a, b) in enumerate(zip(obj1, obj2)):
+    for index, (a, b) in enumerate(zip(one, two)):
       status = compare(a, b, self.objectives[index].to_minimize)
       if status == -1:
         #obj2[i] better than obj1[i]

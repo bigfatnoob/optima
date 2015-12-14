@@ -72,5 +72,5 @@ def cover(m, p_outer, p_inner=None):
 
 
 if __name__ == "__main__":
-  x = cover(8, 3, 2)
+  x = cover(3, 12, 0)
   print(len(x))
