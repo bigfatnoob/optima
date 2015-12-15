@@ -14,9 +14,8 @@ def convergence(obtained, ideals):
   """
   if ideals is None:
     return None
-  predicts = [o.objectives for o in obtained]
   gammas = []
-  for predict in predicts:
-    gammas.append(min([eucledian(predict, ideal) for ideal in ideals]))
+  for o in obtained:
+    gammas.append(min([eucledian(o, ideal) for ideal in ideals]))
   return sum(gammas)/len(gammas)
 

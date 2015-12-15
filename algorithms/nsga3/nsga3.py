@@ -84,7 +84,7 @@ class NSGA3(Algorithm):
       say(".")
       population = self.select(population)
       population = self.evolve(population)
-      print(gens, self.IGD(population, self.problem.get_pareto_front()))
+      #print(gens, self.IGD(population, self.problem.get_pareto_front()))
       gens += 1
     print("")
     return population
