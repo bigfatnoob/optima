@@ -45,13 +45,14 @@ class MOEA_D(Algorithm):
     Algorithm.__init__(self, 'MOEA/D', problem)
     self.settings = default_settings().update(**settings)
     self.population = population
+    self.ideal = [sys.maxint if obj.to_minimize else -sys.maxint for obj in self.problem.objectives]
+    self.best_boundary_objectives = [None]*len(self.problem.objectives)
 
 
   def setup(self, population):
     """
     Mark each point with the nearest "T"
     weight vectors and return the global best.
-    :return: Global Best vector
     """
     self.init_weights(population)
     for key in population.keys():
@@ -66,10 +67,8 @@ class MOEA_D(Algorithm):
         distances.append(eucledian(population[one].weight, population[two].weight))
       sorted_ids = [index for dist, index in sorted(zip(distances, ids))]
       population[one].neighbor_ids = sorted_ids[:self.settings.T]
-    ideal = [sys.maxint if obj.to_minimize else -sys.maxint for obj in self.problem.objectives]
     for key in population.keys():
-      ideal = self.update_ideal(ideal, population[key])
-    return ideal
+      self.update_ideal(population[key])
 
 
 
@@ -79,7 +78,6 @@ class MOEA_D(Algorithm):
     uniform weights using the Das Dennis Technique.
     If not, we randomly generate them.
     :param population:
-    :return:
     """
     m = len(self.problem.objectives)
     def random_weights():
@@ -122,7 +120,7 @@ class MOEA_D(Algorithm):
     for one in self.population:
       pt = MOEADPoint(one)
       population[pt.id] = pt
-    ideal = self.setup(population)
+    self.setup(population)
     gen = 0
     while gen < self.settings.gens:
       gen += 1
@@ -130,23 +128,24 @@ class MOEA_D(Algorithm):
       for point_id in shuffle(population.keys()):
         mutant = self.reproduce(population[point_id], population)
         mutant.evaluate(self.problem)
-        ideal = self.update_ideal(ideal, mutant)
-        self.update_neighbors(population[point_id], mutant, ideal, population)
+        self.update_ideal(mutant)
+        self.update_neighbors(population[point_id], mutant, population)
       objs = [population[pt_id].objectives for pt_id in population.keys()]
       print(gen, igd(objs, ideal_pf))
 
 
-  def update_ideal(self, ideal, point):
+  def update_ideal(self, point):
     for i, obj in enumerate(self.problem.objectives):
       if obj.to_minimize:
-        if point.objectives[i] < ideal[i]:
-          ideal[i] = point.objectives[i]
+        if point.objectives[i] < self.ideal[i]:
+          self.ideal[i] = point.objectives[i]
+          self.best_boundary_objectives[i] = point.objectives[:]
       else:
-        if point.objectives[i] > ideal[i]:
-          ideal[i] = point.objectives[i]
-    return ideal
+        if point.objectives[i] > self.ideal[i]:
+          self.ideal[i] = point.objectives[i]
+          self.best_boundary_objectives[i] = point.objectives[:]
 
-  def update_neighbors(self, point, mutant, ideal, population):
+  def update_neighbors(self, point, mutant, population):
     assert False
 
   def get_nadir_point(self, population):

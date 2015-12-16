@@ -14,33 +14,41 @@ class MOEA_TCH(MOEA_D):
     self.settings = moead_tch_settings().update(**settings)
     self.name = "MOEA__TCH"
 
-  def update_neighbors(self, point, mutant, ideal, population):
+  def update_neighbors(self, point, mutant, population):
     for neighbor_id in point.neighbor_ids:
       neighbor = population[neighbor_id]
-      nadir = self.get_nadir_point(population)
-      neighbor_distance = self.normalized_tch_distance(neighbor.objectives, neighbor.weight, ideal, nadir)
-      mutant_distance = self.normalized_tch_distance(mutant.objectives, neighbor.weight, ideal, nadir)
+      neighbor_distance = self.normalized_tch_distance(neighbor.objectives, neighbor.weight)
+      mutant_distance = self.normalized_tch_distance(mutant.objectives, neighbor.weight)
       if mutant_distance < neighbor_distance:
         population[neighbor_id].decisions = mutant.decisions
         population[neighbor_id].objectives = mutant.objectives
 
-  def normalized_tch_distance(self, objectives, weights, ideal, nadir):
-    dist =  -sys.maxint
-    for i in range(len(self.problem.objectives)):
-      if ideal[i] == nadir[i]:
+  def normalized_tch_distance(self, objectives, weights):
+    mins = [sys.maxint] * len(self.problem.objectives)
+    maxs = [-sys.maxint] * len(self.problem.objectives)
+    for i in xrange(len(self.problem.objectives)):
+      for j in xrange(len(self.problem.objectives)):
+        val = self.best_boundary_objectives[j][j]
+        if val > maxs[i]: maxs[i] = val
+        if val < mins[i]: mins[i] = val
+      if maxs[i] == mins[i]:
+        print("min value and max value are the same")
         return sys.maxint
-      normalized = abs((objectives[i]-ideal[i])/(nadir[i]-ideal[i]))
+
+    dist = -sys.maxint
+    for i in xrange(len(self.problem.objectives)):
+      normalized = abs((objectives[i]-self.ideal[i])/(maxs[i]-mins[i]))
       if weights[i] == 0:
-        normalized *= 0.00001
+        normalized *= 0.0001
       else:
         normalized *= weights[i]
-      dist = max(dist, weights[i]*normalized)
+      dist = max(dist, normalized)
     assert dist >= 0, "Distance can't be less than 0"
     return dist
 
 
 if __name__ == "__main__":
   from problems.dtlz.dtlz1 import DTLZ1
-  o = DTLZ1(15)
-  moead = MOEA_TCH(o, pop_size=135, gens = 1500)
+  o = DTLZ1(10)
+  moead = MOEA_TCH(o, pop_size=275, gens = 1000)
   moead.run()
