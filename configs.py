@@ -7,7 +7,7 @@ from utils.lib import O
 
 __author__ = 'panzer'
 
-GENS = 250
+GENS = 400
 REPEATS = 5
 
 def gale_settings():
@@ -58,10 +58,16 @@ def moead_settings():
   Default MOEA/D settings
   """
   return O(
-    pop_size = 100,   # Size of Population
+    pop_size = 91,   # Size of Population
     gens = GENS,      # Number of generations
     cr = 1,           # Crossover rate for SBX
     nc = 20,          # eta for SBX
     nm = 20,          # eta for Mutation
     T = 20,           # Closest weight vectors.
   )
+
+def moead_tch_settings():
+  return moead_settings().update(
+
+  )
+

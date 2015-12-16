@@ -114,7 +114,7 @@ class MOEA_D(Algorithm):
     return mutant
 
   def run(self):
-    from measures.convergence import convergence
+    from measures.igd import igd
     ideal_pf = self.problem.get_pareto_front()
     if self.population is None:
       self.population = self.problem.populate(self.settings.pop_size)
@@ -133,7 +133,7 @@ class MOEA_D(Algorithm):
         ideal = self.update_ideal(ideal, mutant)
         self.update_neighbors(population[point_id], mutant, ideal, population)
       objs = [population[pt_id].objectives for pt_id in population.keys()]
-      print(gen, convergence(objs, ideal_pf))
+      print(gen, igd(objs, ideal_pf))
 
 
   def update_ideal(self, ideal, point):

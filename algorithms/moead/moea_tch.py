@@ -2,15 +2,16 @@ from __future__ import print_function, division
 import sys, os
 sys.path.append(os.path.abspath("."))
 from  moea_d import MOEA_D
-
+from configs import moead_tch_settings
 
 class MOEA_TCH(MOEA_D):
   """
   Subclass of MOEA_D that implements the
-  normalized tchebychev method.
+  normalized tchebyshev method.
   """
   def __init__(self, problem, population=None, **settings):
-    MOEA_D.__init__(self, problem, population, **settings)
+    MOEA_D.__init__(self, problem, population)
+    self.settings = moead_tch_settings().update(**settings)
     self.name = "MOEA__TCH"
 
   def update_neighbors(self, point, mutant, ideal, population):
@@ -28,13 +29,18 @@ class MOEA_TCH(MOEA_D):
     for i in range(len(self.problem.objectives)):
       if ideal[i] == nadir[i]:
         return sys.maxint
-      dist = max(dist, weights[i]*abs((objectives[i]-ideal[i])/(nadir[i]-ideal[i])))
+      normalized = abs((objectives[i]-ideal[i])/(nadir[i]-ideal[i]))
+      if weights[i] == 0:
+        normalized *= 0.00001
+      else:
+        normalized *= weights[i]
+      dist = max(dist, weights[i]*normalized)
     assert dist >= 0, "Distance can't be less than 0"
     return dist
 
 
 if __name__ == "__main__":
   from problems.dtlz.dtlz1 import DTLZ1
-  o = DTLZ1(3)
-  moead = MOEA_TCH(o)
+  o = DTLZ1(15)
+  moead = MOEA_TCH(o, pop_size=135, gens = 1500)
   moead.run()
