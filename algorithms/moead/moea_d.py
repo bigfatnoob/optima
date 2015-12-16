@@ -39,7 +39,7 @@ class MOEA_D(Algorithm):
   """
   Base MOEA_D Class. All its specific versions like
   the Tchebyshev and PBI versions should extend this
-  class and implement the update neighbors function
+  class and implement the self.distance function
   """
   def __init__(self, problem, population=None, **settings):
     Algorithm.__init__(self, 'MOEA/D', problem)
@@ -146,6 +146,21 @@ class MOEA_D(Algorithm):
           self.best_boundary_objectives[i] = point.objectives[:]
 
   def update_neighbors(self, point, mutant, population):
+    for neighbor_id in point.neighbor_ids:
+      neighbor = population[neighbor_id]
+      neighbor_distance = self.distance(neighbor.objectives, neighbor.weight)
+      mutant_distance = self.distance(mutant.objectives, neighbor.weight)
+      if mutant_distance < neighbor_distance:
+        population[neighbor_id].decisions = mutant.decisions
+        population[neighbor_id].objectives = mutant.objectives
+
+  def distance(self, objectives, weights):
+    """
+    To be implemented by subclasses
+    :param objectives: Objective vector
+    :param weights: Corresponding weight vector
+    :return:
+    """
     assert False
 
   def get_nadir_point(self, population):

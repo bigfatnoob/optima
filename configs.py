@@ -67,7 +67,15 @@ def moead_settings():
   )
 
 def moead_tch_settings():
+  """
+  Default MOEA/TCH settings
+  """
+  return moead_settings().update()
+
+def moead_pbi_settings():
+  """
+  Default MOEA/PBI settings
+  """
   return moead_settings().update(
-
+    penalty = 5
   )
-

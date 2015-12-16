@@ -1,7 +1,7 @@
 from __future__ import print_function, division
 import sys, os
 sys.path.append(os.path.abspath("."))
-from  moea_d import MOEA_D
+from moea_d import MOEA_D
 from configs import moead_tch_settings
 
 class MOEA_TCH(MOEA_D):
@@ -14,16 +14,7 @@ class MOEA_TCH(MOEA_D):
     self.settings = moead_tch_settings().update(**settings)
     self.name = "MOEA__TCH"
 
-  def update_neighbors(self, point, mutant, population):
-    for neighbor_id in point.neighbor_ids:
-      neighbor = population[neighbor_id]
-      neighbor_distance = self.normalized_tch_distance(neighbor.objectives, neighbor.weight)
-      mutant_distance = self.normalized_tch_distance(mutant.objectives, neighbor.weight)
-      if mutant_distance < neighbor_distance:
-        population[neighbor_id].decisions = mutant.decisions
-        population[neighbor_id].objectives = mutant.objectives
-
-  def normalized_tch_distance(self, objectives, weights):
+  def distance(self, objectives, weights):
     mins = [sys.maxint] * len(self.problem.objectives)
     maxs = [-sys.maxint] * len(self.problem.objectives)
     for i in xrange(len(self.problem.objectives)):
