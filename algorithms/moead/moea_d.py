@@ -7,6 +7,8 @@ import utils.tools as tools
 from configs import moead_settings as default_settings
 from algorithms.nsga3.reference import cover, DIVISIONS
 from utils.distances import eucledian
+from decompositions import get_distance
+from reproduction import get_crossover
 
 __author__ = 'panzer'
 
@@ -37,9 +39,7 @@ class MOEADPoint(Point):
 
 class MOEA_D(Algorithm):
   """
-  Base MOEA_D Class. All its specific versions like
-  the Tchebyshev and PBI versions should extend this
-  class and implement the self.distance function
+  Implements Zhang & Li's MOEAD algorithm
   """
   def __init__(self, problem, population=None, **settings):
     Algorithm.__init__(self, 'MOEA/D', problem)
@@ -47,6 +47,9 @@ class MOEA_D(Algorithm):
     self.population = population
     self.ideal = [sys.maxint if obj.to_minimize else -sys.maxint for obj in self.problem.objectives]
     self.best_boundary_objectives = [None]*len(self.problem.objectives)
+    self.distance = get_distance(self.settings.distance)
+    self.crossover = get_crossover(self.settings.crossover)
+    self.neighborhood = "local"
 
 
   def setup(self, population):
@@ -100,15 +103,9 @@ class MOEA_D(Algorithm):
       population[key].weight = weights[i]
 
   def reproduce(self, point, population):
-    one = rand_one(point.neighbor_ids)
-    two = rand_one(point.neighbor_ids)
-    while one != two:
-      two = rand_one(point.neighbor_ids)
-    mom = population[one].decisions
-    dad = population[two].decisions
-    sis, _ = tools.sbx(self.problem, mom, dad, cr = self.settings.cr, eta=self.settings.nc)
-    sis = tools.poly_mutate(self.problem, sis, eta=self.settings.nm)
-    mutant = MOEADPoint(sis)
+    child = self.crossover(self, point, population)
+    child = tools.poly_mutate(self.problem, child, eta=self.settings.nm)
+    mutant = MOEADPoint(child)
     return mutant
 
   def run(self):
@@ -146,22 +143,14 @@ class MOEA_D(Algorithm):
           self.best_boundary_objectives[i] = point.objectives[:]
 
   def update_neighbors(self, point, mutant, population):
-    for neighbor_id in point.neighbor_ids:
+    ids = point.neighbor_ids if self.neighborhood == "local" else population.keys()
+    for neighbor_id in ids:
       neighbor = population[neighbor_id]
-      neighbor_distance = self.distance(neighbor.objectives, neighbor.weight)
-      mutant_distance = self.distance(mutant.objectives, neighbor.weight)
+      neighbor_distance = self.distance(self, neighbor.objectives, neighbor.weight)
+      mutant_distance = self.distance(self, mutant.objectives, neighbor.weight)
       if mutant_distance < neighbor_distance:
         population[neighbor_id].decisions = mutant.decisions
         population[neighbor_id].objectives = mutant.objectives
-
-  def distance(self, objectives, weights):
-    """
-    To be implemented by subclasses
-    :param objectives: Objective vector
-    :param weights: Corresponding weight vector
-    :return:
-    """
-    assert False
 
   def get_nadir_point(self, population):
     nadir = [-sys.maxint if obj.to_minimize else sys.maxint for obj in self.problem.objectives]
@@ -176,4 +165,8 @@ class MOEA_D(Algorithm):
     return nadir
 
 
-
+if __name__ == "__main__":
+  from problems.dtlz.dtlz1 import DTLZ1
+  o = DTLZ1(15)
+  moead = MOEA_D(o, pop_size=135, gens = 1500)
+  moead.run()

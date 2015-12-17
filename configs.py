@@ -58,24 +58,15 @@ def moead_settings():
   Default MOEA/D settings
   """
   return O(
-    pop_size = 91,   # Size of Population
-    gens = GENS,      # Number of generations
-    cr = 1,           # Crossover rate for SBX
-    nc = 20,          # eta for SBX
-    nm = 20,          # eta for Mutation
-    T = 20,           # Closest weight vectors.
-  )
-
-def moead_tch_settings():
-  """
-  Default MOEA/TCH settings
-  """
-  return moead_settings().update()
-
-def moead_pbi_settings():
-  """
-  Default MOEA/PBI settings
-  """
-  return moead_settings().update(
-    penalty = 5
+    pop_size = 91,      # Size of Population
+    gens = GENS,        # Number of generations
+    distance = "pbi",   # Distance metric
+    T = 20,             # Closest weight vectors.
+    penalty = 5,        # Penalty parameter for PBI distance
+    crossover = "de",   # Crossover Metric
+    cr = 1,             # Crossover rate for SBX
+    nc = 20,            # eta for SBX
+    nm = 20,            # eta for Mutation
+    de_np = 0.9,        # DE neighborhood probability
+    de_cr = 0.5         # DE crossover rate
   )
