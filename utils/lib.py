@@ -306,3 +306,11 @@ class Point(O):
 
   def __hash__(self):
     return hash(frozenset(self.decisions))
+
+def is_even(i):
+  """
+  Checks if "i" is even
+  :param i:
+  :return: True / False
+  """
+  return i % 2 == 0
