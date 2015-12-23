@@ -16,11 +16,13 @@ class Algorithm(O):
     O.__init__(self)
     self.name = name
     self.problem = problem
-    self.stat = Stat(problem)
+    self.stat = Stat(problem, self)
     self.select = None
     self.evolve = None
     self.recombine = None
     self._reference = None
+    self.is_pareto = True
+    self.gen = 0
 
   @staticmethod
   def solution_range(obtained):

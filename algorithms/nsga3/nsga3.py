@@ -75,18 +75,21 @@ class NSGA3(Algorithm):
     self.frontiers = []
 
   def run(self):
+    start = get_time()
     if not self.population:
       self.population = self.problem.populate(self.settings.pop_size)
     population = [NSGAPoint(one) for one in self.population]
-    gens = 0
-    random.seed(0)
-    while gens < self.settings.gens:
+    self.stat.update(population)
+    while self.gen < self.settings.gens:
       say(".")
+      self.gen += 1
       population = self.select(population)
       population = self.evolve(population)
+      self.stat.update(population)
       #print(gens, self.IGD(population, self.problem.get_pareto_front()))
-      gens += 1
+      print(self.gen, self.stat.evals)
     print("")
+    self.stat.runtime = get_time() - start
     return population
 
   def _select(self, population):
@@ -142,7 +145,7 @@ class NSGA3(Algorithm):
     frontiers = []
     front1 = []
     for one in population:
-      one.evaluate(self.problem)
+      one.evaluate(self.problem, self.stat, self.gen)
     for one, rest in loo(population):
       for two in rest:
         domination_status = tools.nsga_domination(self.problem, one, two)
@@ -365,5 +368,8 @@ class NSGA3(Algorithm):
     return self._reference
 
 
-
-
+if __name__ == "__main__":
+  from problems.dtlz.dtlz1 import DTLZ1
+  o = DTLZ1(3)
+  nsga3 = NSGA3(o, pop_size=91, gens = 10)
+  nsga3.run()

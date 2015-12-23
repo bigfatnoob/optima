@@ -35,6 +35,7 @@ for problem in problems:
   for i in range(REPEATS):
     for algo in algorithms:
       print(algo.__name__)
-      solutions = algo(problem).run()
-      exit()
+      opt = algo(problem, gens=10)
+      opt.run()
+      opt.stat.to_json(i+1)
       # Store and process solutions

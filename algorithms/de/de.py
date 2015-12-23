@@ -25,39 +25,42 @@ class DE(Algorithm):
     """
     Algorithm.__init__(self, 'DE', problem)
     self.settings = default_settings().update(**settings)
-    self.settings.pop_size = len(self.problem.decisions)*10
+    #self.settings.pop_size = len(self.problem.decisions)*10
     self.population = population
     self.select = self._select
     self.evolve = self._evolve
 
 
   def run(self):
+    start = get_time()
     if not self.population:
       self.population = self.problem.populate(self.settings.pop_size)
     population = [Point(one) for one in self.population]
-    gens = 0
-    while gens < self.settings.gens:
+    self.stat.update(population)
+    while self.gen < self.settings.gens:
       say(".")
+      self.gen += 1
       selected = self.select(population)
       population = self.evolve(selected, population)
-      print(gens, self.IGD(population, self.problem.get_pareto_front()))
-      gens += 1
+      self.stat.update(population)
+      print(self.gen, self.stat.evals)
+    self.stat.runtime = get_time() - start
     return population
 
   def _select(self, population):
     clones = []
     for one in population:
       clone = one.clone()
-      clone.evaluate(self.problem)
+      clone.evaluate(self.problem, self.stat, self.gen)
       clones.append(clone)
     assert self.settings.pop_size == len(clones), "Size mismatch"
     return clones
 
   def _evolve(self, selected, population):
     for point in population:
-      point.evaluate(self.problem)
+      point.evaluate(self.problem, self.stat, self.gen)
       mutant = self.mutate(point, population)
-      mutant.evaluate(self.problem)
+      mutant.evaluate(self.problem, self.stat, self.gen)
       if self.problem.binary_dominates(mutant.objectives, point.objectives) == 1:
         selected.remove(point)
         selected.append(mutant)
@@ -99,6 +102,10 @@ class DE(Algorithm):
     four = one_other()
     return two, three, four
 
-
+if __name__ == "__main__":
+  from problems.dtlz.dtlz1 import DTLZ1
+  prob = DTLZ1(3)
+  de = DE(prob, pop_size=100, gens = 400)
+  de.run()
 
 

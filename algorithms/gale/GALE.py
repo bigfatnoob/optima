@@ -30,29 +30,29 @@ class GALE(Algorithm):
     self.recombine = self._recombine
     self.population = population
     self.settings = default_settings().update(**settings)
+    self.is_pareto = False # Indicates if final population represents the pareto front
 
   def run(self):
+    start = get_time()
     if not self.population:
       self.population = self.problem.populate(self.settings.pop_size)
     population = Node.format(self.population)
     best_solutions = []
-    gen = 0
-    while gen < self.settings.gens:
+    while self.gen < self.settings.gens:
       say(".")
-      total_evals = 0
+      self.gen += 1
       # SELECTION
-      selectees, evals =  self.select(population)
-      solutions, evals = self.get_best(selectees)
+      selectees = self.select(population)
+      solutions = self.get_best(selectees)
+      self.stat.update(solutions)
       best_solutions += solutions
-      total_evals += evals
 
       # EVOLUTION
-      selectees, evals = self.evolve(selectees)
-      total_evals += evals
+      selectees = self.evolve(selectees)
 
-      population, evals = self.recombine(selectees, self.settings.pop_size)
-      total_evals += evals
-      gen += 1
+      population = self.recombine(selectees, self.settings.pop_size)
+      print(self.gen, self.stat.evals)
+    self.stat.runtime = get_time() - start
     print("")
     return best_solutions
 
@@ -64,16 +64,13 @@ class GALE(Algorithm):
     :return:
     """
     bests = []
-    evals = 0
     for leaf in non_dom_leaves:
       east = leaf.get_pop()[0]
       west = leaf.get_pop()[-1]
       if not east.evaluated:
-        east.evaluate(self.problem)
-        evals += 1
+        east.evaluate(self.problem, self.stat, self.gen)
       if not west.evaluated:
-        west.evaluate(self.problem)
-        evals += 1
+        west.evaluate(self.problem, self.stat, self.gen)
       weights = self.problem.directional_weights()
       weighted_west = [c*w for c,w in zip(west.objectives, weights)]
       weighted_east = [c*w for c,w in zip(east.objectives, weights)]
@@ -84,25 +81,16 @@ class GALE(Algorithm):
         bests.append(east)
       else:
         bests.append(west)
-    return bests, evals
+    return bests
 
 
   def _select(self, pop):
     node = Node(self.problem, pop, self.settings.pop_size).divide(sqrt(pop))
     non_dom_leafs = node.nonpruned_leaves()
-    all_leafs = node.leaves()
-
-    # Counting number of evals
-    evals = 0
-    for leaf in all_leafs:
-      for row in leaf.get_pop():
-        if row.evaluated:
-          evals+=1
-    return non_dom_leafs, evals
+    return non_dom_leafs
 
 
   def _evolve(self, selected):
-    evals = 0
     gamma = self.settings.gamma
     for leaf in selected:
       #Poles
@@ -110,11 +98,9 @@ class GALE(Algorithm):
       west = leaf.get_pop()[-1]
       # Evaluate poles if required
       if not east.evaluated:
-        east.evaluate(self.problem)
-        evals += 1
+        east.evaluate(self.problem, self.stat, self.gen)
       if not west.evaluated:
-        west.evaluate(self.problem)
-        evals += 1
+        west.evaluate(self.problem, self.stat, self.gen)
 
       weights = self.problem.directional_weights()
       weighted_west = [c*w for c,w in zip(west.objectives, weights)]
@@ -161,14 +147,20 @@ class GALE(Algorithm):
     for leaf in selected:
       for row in leaf.get_pop():
         if row.evaluated:
-          row.evaluate(self.problem) # Re-evaluating
+          row.evaluate(self.problem, self.stat, self.gen) # Re-evaluating
         pop.append(row)
 
-    return pop, evals
+    return pop
 
   def _recombine(self, mutants, total_size):
     remaining = total_size - len(mutants)
     pop = []
     for _ in range(remaining):
       pop.append(self.problem.generate())
-    return mutants + Node.format(pop), 0
+    return mutants + Node.format(pop)
+
+if __name__ == "__main__":
+  from problems.dtlz.dtlz1 import DTLZ1
+  prob = DTLZ1(3)
+  gale = GALE(prob, pop_size=91, gens = 30)
+  gale.run()

@@ -4,6 +4,7 @@ sys.path.append(os.path.abspath("."))
 import random
 import sys
 import math
+import time
 
 PI = math.pi
 EPS = 0.000001
@@ -293,13 +294,22 @@ class Point(O):
     new.objectives = self.objectives[:]
     return new
 
-  def evaluate(self, problem):
+  def evaluate(self, problem, stat = None, gen = None):
     """
     Evaluate a point
     :param problem: Problem used to evaluate
     """
     if not self.objectives:
       self.objectives = problem.evaluate(self.decisions)
+      if stat:
+        stat.evals+=1
+        if gen is not None:
+          if stat.gen_evals is None:
+            stat.gen_evals = []
+          if len(stat.gen_evals) == gen:
+            stat.gen_evals[gen-1] += 1
+          else:
+            stat.gen_evals.append(1)
 
   def __eq__(self, other):
     return self.decisions == other.decisions
@@ -314,3 +324,10 @@ def is_even(i):
   :return: True / False
   """
   return i % 2 == 0
+
+def get_time():
+  return time.clock()
+
+def mkdir(directory):
+  if not os.path.exists(directory):
+    os.makedirs(directory)

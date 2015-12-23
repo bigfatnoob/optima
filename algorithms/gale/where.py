@@ -139,8 +139,9 @@ class NodePoint(Point):
     """
     return self.closest(problem, pop, init=-sys.maxint, better=more)
 
-  def evaluate(self, problem):
-    self.objectives = problem.evaluate(self.decisions)
+  def evaluate(self, problem, stat=None, gen = None):
+    Point.evaluate(self, problem, stat=stat, gen = gen)
+    #self.objectives = problem.evaluate(self.decisions)
     self.evaluated = True
 
 

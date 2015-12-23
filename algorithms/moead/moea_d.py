@@ -35,6 +35,7 @@ class MOEADPoint(Point):
     if self.wt_indices: new.wt_indices = self.wt_indices[:]
     if self.weight: new.weight = self.weight[:]
     if self.neighbor_ids: new.neighbor_ids = self.neighbor_ids[:]
+    return new
 
 
 class MOEA_D(Algorithm):
@@ -59,7 +60,7 @@ class MOEA_D(Algorithm):
     """
     self.init_weights(population)
     for key in population.keys():
-      population[key].evaluate(self.problem)
+      population[key].evaluate(self.problem, self.stat, 1)
     for one in population.keys():
       distances = []
       ids = []
@@ -110,6 +111,7 @@ class MOEA_D(Algorithm):
 
   def run(self):
     from measures.igd import igd
+    start = get_time()
     ideal_pf = self.problem.get_pareto_front()
     if self.population is None:
       self.population = self.problem.populate(self.settings.pop_size)
@@ -118,17 +120,21 @@ class MOEA_D(Algorithm):
       pt = MOEADPoint(one)
       population[pt.id] = pt
     self.setup(population)
-    gen = 0
-    while gen < self.settings.gens:
-      gen += 1
+    self.stat.update(population.values())
+    while self.gen < self.settings.gens:
       say(".")
+      self.gen += 1
       for point_id in shuffle(population.keys()):
         mutant = self.reproduce(population[point_id], population)
-        mutant.evaluate(self.problem)
+        mutant.evaluate(self.problem, self.stat, self.gen)
         self.update_ideal(mutant)
         self.update_neighbors(population[point_id], mutant, population)
       objs = [population[pt_id].objectives for pt_id in population.keys()]
-      print(gen, igd(objs, ideal_pf))
+      self.stat.update(population.values())
+      print(self.gen, igd(objs, ideal_pf), self.stat.evals)
+    self.stat.runtime = get_time() - start
+    print(self.stat.runtime, len(self.stat.generations))
+    return population
 
 
   def update_ideal(self, point):
@@ -167,6 +173,6 @@ class MOEA_D(Algorithm):
 
 if __name__ == "__main__":
   from problems.dtlz.dtlz1 import DTLZ1
-  o = DTLZ1(15)
-  moead = MOEA_D(o, pop_size=135, gens = 1500)
+  o = DTLZ1(3)
+  moead = MOEA_D(o, pop_size=91, gens = 10)
   moead.run()
