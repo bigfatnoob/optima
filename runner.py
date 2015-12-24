@@ -45,9 +45,7 @@ for problem in problems:
     for algo in algorithms:
       print(algo.__name__)
       opt = algo(problem)
-      print(opt.settings)
-      # exit()
-      # opt.run()
-      # opt.stat.to_json(i+1)
-      # print()
+      opt.run()
+      opt.stat.to_json(i+1)
+      print()
       # Store and process solutions
