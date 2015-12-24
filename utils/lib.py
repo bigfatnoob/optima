@@ -5,6 +5,10 @@ import random
 import sys
 import math
 import time
+import json
+import numpy as np
+
+__author__ = 'panzer'
 
 PI = math.pi
 EPS = 0.000001
@@ -326,8 +330,53 @@ def is_even(i):
   return i % 2 == 0
 
 def get_time():
+  """
+  Get Current Wall clock time in milliseconds
+  :return:
+  """
   return time.clock()
 
 def mkdir(directory):
+  """
+  Implements the "mkdir" linux function
+  :param directory:
+  :return:
+  """
   if not os.path.exists(directory):
     os.makedirs(directory)
+
+def get_subdirectories(base_dir):
+  """
+  List sub-directories in a folder
+  :param base_dir:
+  :return:
+  """
+  return [x[1] for x in os.walk(base_dir)][0]
+
+def ls(directory):
+  """
+  Implements the "ls" linux function
+  :param directory:
+  :return:
+  """
+  return os.listdir(directory)
+
+def get_json(file_path):
+  """
+  Retrieve json from a file
+  :param file_path:
+  :return: JSON object
+  """
+  with open(file_path) as json_file:
+    json_data = json.load(json_file)
+  return json_data
+
+def mean_iqr(lst):
+  """
+  return mean and iqr of a list.
+  :param lst: List to fetch mean and iqr
+  :return: (mean, iqr)
+  """
+  mean = np.mean(lst)
+  q75, q25 = np.percentile(lst, [75, 25])
+  return mean, q75 - q25

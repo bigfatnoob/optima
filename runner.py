@@ -3,6 +3,8 @@ import sys, os
 sys.path.append(os.path.abspath("."))
 from configs import REPEATS
 
+from utils.stat import Stat
+
 # Problems
 from problems.dtlz.dtlz1 import DTLZ1
 from problems.dtlz.dtlz2 import DTLZ2
@@ -38,7 +40,7 @@ algorithms = [
   MOEA_TCH,
 ]
 
-
+expt_id = sys.argv[1]
 for problem in problems:
   print(problem.title())
   for i in range(1):
@@ -49,3 +51,4 @@ for problem in problems:
       opt.stat.to_json(i+1)
       print()
       # Store and process solutions
+Stat.plot_experiment(expt_id)

@@ -3,14 +3,16 @@ Statistics for running an
 optimizer on a problem
 """
 from __future__ import print_function,division
-import sys, os, json
+import sys, os
 sys.path.append(os.path.abspath("."))
-__author__ = 'panzer'
 from lib import *
 from measures.hypervolume import HyperVolume
 from measures.convergence import convergence
 from measures.diversity import diversity
 from measures.igd import igd
+from plot import *
+
+__author__ = 'panzer'
 
 class Stat(O):
   def __init__(self, problem, optimizer):
@@ -91,7 +93,7 @@ class Stat(O):
         pt["objectives"] = point.objectives
         pts.append(pt)
       gens.append(pts)
-    #json_dict["generations"] = gens
+    json_dict["generations"] = gens
     json_dict["decisions"] = [dec.__dict__ for dec in self.decisions]
     json_dict["objectives"] = [obj.__dict__ for obj in self.objectives]
     self.update_solutions()
@@ -121,3 +123,46 @@ class Stat(O):
     file_name = folder + "rep_%d.json"%repeat
     with open(file_name, "w") as outfile:
       json.dump(json_dict, outfile, indent=4)
+
+  @staticmethod
+  def plot_experiment(expt_id):
+    base_dir = "results/%s"%expt_id
+    problems = get_subdirectories(base_dir)
+    for problem in problems:
+      problem_dir = base_dir + "/%s"%problem
+      algos =  get_subdirectories(problem_dir)
+      convs, divs, igds, hvs = {}, {}, {}, {}
+      for algo in algos:
+        algo_dir = problem_dir + "/%s"%algo
+        reps = ls(algo_dir)
+        conv_list, div_list, igd_list, hv_list = [], [], [], []
+        for rep in reps:
+          rep_file = algo_dir + "/%s"%rep
+          json_data = get_json(rep_file)
+          conv_val = json_data.get("convergence", None)
+          if conv_val : conv_list.append(conv_val)
+          div_val = json_data.get("spread", None)
+          if div_val : div_list.append(div_val)
+          igd_val = json_data.get("igd", None)
+          if igd_val : igd_list.append(igd_val)
+          hv_val = json_data.get("hyperVolume", None)
+          if hv_val : hv_list.append(hv_val)
+        if conv_list:
+          mean, iqr = mean_iqr(conv_list)
+          convs[algo] = (mean, iqr)
+        if div_list:
+          mean, iqr = mean_iqr(div_list)
+          divs[algo] = (mean, iqr)
+        if igd_list:
+          mean, iqr = mean_iqr(igd_list)
+          igds[algo] = (mean, iqr)
+        if hv_list:
+          mean, iqr = mean_iqr(hv_list)
+          hvs[algo] = (mean, iqr)
+      bar_plot(convs, "Convergence", problem, problem_dir)
+      bar_plot(divs, "Diversity", problem, problem_dir)
+      bar_plot(igds, "IGD", problem, problem_dir)
+      bar_plot(hvs, "Hyper_Volume", problem, problem_dir)
+
+if __name__ == "__main__":
+  Stat.plot_experiment("temp")
