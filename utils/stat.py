@@ -7,6 +7,10 @@ import sys, os, json
 sys.path.append(os.path.abspath("."))
 __author__ = 'panzer'
 from lib import *
+from measures.hypervolume import HyperVolume
+from measures.convergence import convergence
+from measures.diversity import diversity
+from measures.igd import igd
 
 class Stat(O):
   def __init__(self, problem, optimizer):
@@ -87,7 +91,7 @@ class Stat(O):
         pt["objectives"] = point.objectives
         pts.append(pt)
       gens.append(pts)
-    json_dict["generations"] = gens
+    #json_dict["generations"] = gens
     json_dict["decisions"] = [dec.__dict__ for dec in self.decisions]
     json_dict["objectives"] = [obj.__dict__ for obj in self.objectives]
     self.update_solutions()
@@ -100,10 +104,20 @@ class Stat(O):
       })
     json_dict["solutions"] = solutions
     json_dict["gen_evals"] = self.gen_evals
+    objs = [one.objectives for one in self.solutions]
+    true_pf = self._problem.get_pareto_front()
+    if true_pf:
+      json_dict["convergence"] = convergence(objs, true_pf)
+      json_dict["spread"] = diversity(objs, true_pf)
+      json_dict["igd"] = igd(objs, true_pf)
+    reference = HyperVolume.get_reference_point(self._problem, objs)
+    json_dict["hyperVolume"] = HyperVolume(reference).compute(objs)
+
+
     expt_id = sys.argv[1]
     problem_name = self._problem.name + "_d" + str(len(self.decisions)) + "_o" + str(len(self.objectives))
     folder = "results/%s/%s/%s/"%(expt_id, problem_name, self._optimizer.name)
     mkdir(folder)
     file_name = folder + "rep_%d.json"%repeat
     with open(file_name, "w") as outfile:
-      json.dump(json_dict, outfile)
+      json.dump(json_dict, outfile, indent=4)

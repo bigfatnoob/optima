@@ -63,7 +63,7 @@ def moead_settings():
     distance = "pbi",   # Distance metric
     T = 20,             # Closest weight vectors.
     penalty = 5,        # Penalty parameter for PBI distance
-    crossover = "de",   # Crossover Metric
+    crossover = "sbx",   # Crossover Metric
     cr = 1,             # Crossover rate for SBX
     nc = 20,            # eta for SBX
     nm = 20,            # eta for Mutation

@@ -37,7 +37,7 @@ class HyperVolume:
   """
   def __init__(self, reference):
     self.reference = reference
-    self.list = []
+    self.list = None
 
   def compute(self, front):
     """
@@ -167,6 +167,24 @@ class HyperVolume:
     decorated.sort()
     nodes[:] = [node for (_, node) in decorated]
 
+  @staticmethod
+  def get_reference_point(problem, points):
+    reference = [-sys.maxint if obj.to_minimize else sys.maxint for obj in problem.objectives]
+    for point in points:
+      for i, obj in enumerate(problem.objectives):
+        if obj.to_minimize:
+          if point[i] > reference[i]:
+            reference[i] = point[i]
+        else:
+          if point[i] < reference[i]:
+            reference[i] = point[i]
+    for i, obj in enumerate(problem.objectives):
+      if obj.to_minimize:
+        reference[i] += 1
+      else:
+        reference[i] -= 1
+    return reference
+
 
 class MultiList:
   """A special data structure needed by FonsecaHyperVolume.
@@ -290,9 +308,11 @@ class MultiList:
         bounds[i] = node.value[i]
 
 
+def _test():
+  reference_point = [2,2,2]
+  hv = HyperVolume(reference_point)
+  front = [[1,0,1], [0,1,0]]
+  print(hv.compute(front))
+
 if __name__ == "__main__":
-    # Example:
-    referencePoint = [2, 2, 2]
-    hv = HyperVolume(referencePoint)
-    front = [[1,0,1], [0,1,0]]
-    print(hv.compute(front))
+  _test()

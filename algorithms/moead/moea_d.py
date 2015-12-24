@@ -43,7 +43,7 @@ class MOEA_D(Algorithm):
   Implements Zhang & Li's MOEAD algorithm
   """
   def __init__(self, problem, population=None, **settings):
-    Algorithm.__init__(self, 'MOEA/D', problem)
+    Algorithm.__init__(self, 'MOEA_D', problem)
     self.settings = default_settings().update(**settings)
     self.population = population
     self.ideal = [sys.maxint if obj.to_minimize else -sys.maxint for obj in self.problem.objectives]
@@ -110,9 +110,9 @@ class MOEA_D(Algorithm):
     return mutant
 
   def run(self):
-    from measures.igd import igd
+    #from measures.igd import igd
     start = get_time()
-    ideal_pf = self.problem.get_pareto_front()
+    #ideal_pf = self.problem.get_pareto_front()
     if self.population is None:
       self.population = self.problem.populate(self.settings.pop_size)
     population = {}
@@ -129,11 +129,9 @@ class MOEA_D(Algorithm):
         mutant.evaluate(self.problem, self.stat, self.gen)
         self.update_ideal(mutant)
         self.update_neighbors(population[point_id], mutant, population)
-      objs = [population[pt_id].objectives for pt_id in population.keys()]
+      #objs = [population[pt_id].objectives for pt_id in population.keys()]
       self.stat.update(population.values())
-      print(self.gen, igd(objs, ideal_pf), self.stat.evals)
     self.stat.runtime = get_time() - start
-    print(self.stat.runtime, len(self.stat.generations))
     return population
 
 

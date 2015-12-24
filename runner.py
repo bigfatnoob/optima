@@ -17,6 +17,9 @@ from algorithms.nsga3.nsga3 import NSGA3
 from algorithms.nsga2.nsga2 import NSGA2
 from algorithms.gale.gale import GALE
 from algorithms.de.de import DE
+from algorithms.moead.moea_de import MOEA_DE
+from algorithms.moead.moea_tch import MOEA_TCH
+from algorithms.moead.moea_pbi import MOEA_PBI
 
 __author__ = 'panzer'
 
@@ -26,16 +29,25 @@ problems = [
 ]
 
 algorithms = [
-  NSGA3
+  NSGA3,
+  NSGA2,
+  DE,
+  GALE,
+  MOEA_DE,
+  MOEA_PBI,
+  MOEA_TCH,
 ]
 
 
 for problem in problems:
   print(problem.title())
-  for i in range(REPEATS):
+  for i in range(1):
     for algo in algorithms:
       print(algo.__name__)
-      opt = algo(problem, gens=10)
-      opt.run()
-      opt.stat.to_json(i+1)
+      opt = algo(problem)
+      print(opt.settings)
+      # exit()
+      # opt.run()
+      # opt.stat.to_json(i+1)
+      # print()
       # Store and process solutions

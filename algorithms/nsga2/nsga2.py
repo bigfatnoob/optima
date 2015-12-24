@@ -95,8 +95,6 @@ class NSGA2(Algorithm):
       population = self.select(population)
       population = self.evolve(population, pop_size)
       self.stat.update(population)
-      print(self.gen, self.stat.evals)
-    print("")
     self.stat.runtime = get_time() - start
     return population
 

@@ -43,7 +43,6 @@ class DE(Algorithm):
       selected = self.select(population)
       population = self.evolve(selected, population)
       self.stat.update(population)
-      print(self.gen, self.stat.evals)
     self.stat.runtime = get_time() - start
     return population
 

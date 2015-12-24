@@ -51,9 +51,7 @@ class GALE(Algorithm):
       selectees = self.evolve(selectees)
 
       population = self.recombine(selectees, self.settings.pop_size)
-      print(self.gen, self.stat.evals)
     self.stat.runtime = get_time() - start
-    print("")
     return best_solutions
 
   def get_best(self, non_dom_leaves):

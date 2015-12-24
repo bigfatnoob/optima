@@ -87,8 +87,6 @@ class NSGA3(Algorithm):
       population = self.evolve(population)
       self.stat.update(population)
       #print(gens, self.IGD(population, self.problem.get_pareto_front()))
-      print(self.gen, self.stat.evals)
-    print("")
     self.stat.runtime = get_time() - start
     return population
 
