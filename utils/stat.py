@@ -69,6 +69,7 @@ class Stat(O):
       # not generate solutions on the pareto front.
       for generation in self.generations:
         self.solutions.extend(generation)
+      self.solutions = self.solutions[-self._optimizer.settings.pop_size:]
     else:
       self.solutions = self.generations[-1]
 
@@ -106,6 +107,7 @@ class Stat(O):
       })
     json_dict["solutions"] = solutions
     json_dict["gen_evals"] = self.gen_evals
+    json_dict["evals"] = sum(self.gen_evals)
     objs = [one.objectives for one in self.solutions]
     true_pf = self._problem.get_pareto_front()
     if true_pf:
@@ -131,11 +133,11 @@ class Stat(O):
     for problem in problems:
       problem_dir = base_dir + "/%s"%problem
       algos =  get_subdirectories(problem_dir)
-      convs, divs, igds, hvs = {}, {}, {}, {}
+      convs, divs, igds, hvs, evals = {}, {}, {}, {}, {}
       for algo in algos:
         algo_dir = problem_dir + "/%s"%algo
         reps = ls(algo_dir)
-        conv_list, div_list, igd_list, hv_list = [], [], [], []
+        conv_list, div_list, igd_list, hv_list, eval_list = [], [], [], [], []
         for rep in reps:
           rep_file = algo_dir + "/%s"%rep
           json_data = get_json(rep_file)
@@ -147,6 +149,8 @@ class Stat(O):
           if igd_val : igd_list.append(igd_val)
           hv_val = json_data.get("hyperVolume", None)
           if hv_val : hv_list.append(hv_val)
+          eval_val = json_data.get("evals", None)
+          if eval_val: eval_list.append(eval_val)
         if conv_list:
           mean, iqr = mean_iqr(conv_list)
           convs[algo] = (mean, iqr)
@@ -159,10 +163,14 @@ class Stat(O):
         if hv_list:
           mean, iqr = mean_iqr(hv_list)
           hvs[algo] = (mean, iqr)
+        if eval_list:
+          mean, iqr = mean_iqr(eval_list)
+          evals[algo] = (mean, iqr)
       bar_plot(convs, "Convergence", problem, problem_dir)
       bar_plot(divs, "Diversity", problem, problem_dir)
       bar_plot(igds, "IGD", problem, problem_dir)
       bar_plot(hvs, "Hyper_Volume", problem, problem_dir)
+      bar_plot(evals, "Evaluations", problem, problem_dir, format_unit="%d")
 
 if __name__ == "__main__":
   Stat.plot_experiment("temp")

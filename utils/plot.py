@@ -6,7 +6,9 @@ import matplotlib.pyplot as plt
 
 __author__ = 'panzer'
 
-def bar_plot(data, y_label, title, path):
+COLORS = ["blue", "green", "red", "cyan", "magenta", "yellow", "saddlebrown", "orange", "darkgreen"]
+
+def bar_plot(data, y_label, title, path, format_unit="%0.4f"):
   if not data:
     return
   fig, ax = plt.subplots()
@@ -14,7 +16,7 @@ def bar_plot(data, y_label, title, path):
     for bar in bars:
       height = bar.get_height()
       ax.text(bar.get_x() + bar.get_width()/2., 1.05*height,
-                '%0.4f' % height,
+                format_unit % height,
                 ha='center', va='bottom')
 
   means = []
@@ -25,7 +27,7 @@ def bar_plot(data, y_label, title, path):
     means.append(mean)
     iqrs.append(iqr)
   indices = np.arange(len(labels))
-  rects = ax.bar(indices, means, yerr=iqrs)
+  rects = ax.bar(indices, means, yerr=iqrs, color=COLORS[:len(labels)])
   width = rects[0].get_width()/2
   ax.set_ylabel(y_label)
   ax.set_title(title)
@@ -33,5 +35,6 @@ def bar_plot(data, y_label, title, path):
   ax.set_xticklabels(labels)
   auto_label(rects)
   plt.savefig(path+"/%s.png"%y_label)
+
 
 

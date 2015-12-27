@@ -31,19 +31,19 @@ problems = [
 ]
 
 algorithms = [
-  NSGA3,
-  NSGA2,
+  #NSGA3,
+  #NSGA2,
   DE,
   GALE,
-  MOEA_DE,
+  #MOEA_DE,
   MOEA_PBI,
-  MOEA_TCH,
+  #MOEA_TCH,
 ]
 
 expt_id = sys.argv[1]
 for problem in problems:
   print(problem.title())
-  for i in range(1):
+  for i in range(3):
     for algo in algorithms:
       print(algo.__name__)
       opt = algo(problem)
