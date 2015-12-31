@@ -116,7 +116,7 @@ class Stat(O):
       json_dict["igd"] = igd(objs, true_pf)
     reference = HyperVolume.get_reference_point(self._problem, objs)
     json_dict["hyperVolume"] = HyperVolume(reference).compute(objs)
-
+    json_dict["runtime"] = self.runtime
 
     expt_id = sys.argv[1]
     problem_name = self._problem.name + "_d" + str(len(self.decisions)) + "_o" + str(len(self.objectives))
@@ -133,11 +133,11 @@ class Stat(O):
     for problem in problems:
       problem_dir = base_dir + "/%s"%problem
       algos =  get_subdirectories(problem_dir)
-      convs, divs, igds, hvs, evals = {}, {}, {}, {}, {}
+      convs, divs, igds, hvs, evals, runtimes = {}, {}, {}, {}, {}, {}
       for algo in algos:
         algo_dir = problem_dir + "/%s"%algo
         reps = ls(algo_dir)
-        conv_list, div_list, igd_list, hv_list, eval_list = [], [], [], [], []
+        conv_list, div_list, igd_list, hv_list, eval_list, runtime_list = [], [], [], [], [], []
         for rep in reps:
           rep_file = algo_dir + "/%s"%rep
           json_data = get_json(rep_file)
@@ -151,6 +151,8 @@ class Stat(O):
           if hv_val : hv_list.append(hv_val)
           eval_val = json_data.get("evals", None)
           if eval_val: eval_list.append(eval_val)
+          runtime_val = json_data.get("runtime", None)
+          if runtime_val: runtime_list.append(runtime_val)
         if conv_list:
           mean, iqr = mean_iqr(conv_list)
           convs[algo] = (mean, iqr)
@@ -166,11 +168,15 @@ class Stat(O):
         if eval_list:
           mean, iqr = mean_iqr(eval_list)
           evals[algo] = (mean, iqr)
+        if runtime_list:
+          mean, iqr = mean_iqr(eval_list)
+          runtimes[algo] = (mean, iqr)
       bar_plot(convs, "Convergence", problem, problem_dir)
       bar_plot(divs, "Diversity", problem, problem_dir)
       bar_plot(igds, "IGD", problem, problem_dir)
       bar_plot(hvs, "Hyper_Volume", problem, problem_dir)
       bar_plot(evals, "Evaluations", problem, problem_dir, format_unit="%d")
+      bar_plot(runtimes, "Runtimes", problem, problem_dir, format_unit="%.1f")
 
 if __name__ == "__main__":
   Stat.plot_experiment("temp")

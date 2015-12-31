@@ -46,7 +46,10 @@ class Objective(O):
     self.value = None
 
   def norm(self, val):
-    return norm(val, self.low, self.high)
+    if self.low is None or self.high is None:
+      return val
+    else:
+      return norm(val, self.low, self.high)
 
 class Constraint(O):
   def __init__(self, name):

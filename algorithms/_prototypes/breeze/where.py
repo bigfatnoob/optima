@@ -2,7 +2,7 @@ from __future__ import print_function, division
 import sys
 import os
 sys.path.append(os.path.abspath("."))
-from binary_tree import BinaryTree
+from algorithms.gale.binary_tree import BinaryTree
 from utils.lib import *
 
 __author__ = 'george'
@@ -11,6 +11,7 @@ __author__ = 'george'
 def settings():
   return O(
     verbose =  False,
+    fastmap = "slow", # <fast/slow>
     b4 = '|.. ',
     seed = 1
   )
@@ -174,10 +175,45 @@ class Node(BinaryTree):
   def get_pop(self):
     return self._pop
 
-
   def fastmap(self, problem, pop):
+    if settings().fastmap == "fast":
+      return self.fastmap_fast(problem, pop)
+    elif settings().fastmap == "slow":
+      return self.fastmap_slow(problem, pop)
+
+  def fastmap_slow(self, problem, pop):
     """
-    Fastmap function that projects all the points on the principal component
+    O(n**2) version of Fastmap function that
+    projects all the points on the principal component
+    :param problem:
+    :param pop:
+    :return:
+    """
+    max_dist = -sys.maxint
+    east_index, west_index = None, None
+    for i in range(len(pop)-1):
+      for j in range(i+1, len(pop)):
+        temp_dist = pop[i].dist(problem, pop[j], is_obj=False)
+        if temp_dist > max_dist:
+          max_dist = temp_dist
+          east_index, west_index = i, j
+    self.east = pop[east_index]
+    self.west = pop[west_index]
+    self.c = self.west.dist(problem, self.east, is_obj=False)
+    for one in pop:
+      a = one.dist(problem, self.west, is_obj=False)
+      b = one.dist(problem, self.east, is_obj=False)
+      one.x = Node.projection(a, b, self.c)
+      one.c = self.c
+      one.a = a
+      one.b = b
+    pop = sorted(pop, key=lambda row:row.x)
+    return pop
+
+  def fastmap_fast(self, problem, pop):
+    """
+    O(2*n) version of Fastmap function that
+    projects all the points on the principal component
     :param problem: Instance of the problem
     :param pop: Set of points in the cluster population
     :return:
@@ -222,7 +258,7 @@ class Node(BinaryTree):
     self.n = len(self._pop)
     n = len(self._pop)
 
-    cut, _ = self.binary_chop(self._pop, n//2, None, 2*(n**0.5), n)
+    cut, _ = self.binary_chop(self._pop, n//2, None, 2*n ** 0.5, n)
     self.abort = abort
     if not abort and n >= threshold:
       # Splitting
@@ -250,10 +286,10 @@ class Node(BinaryTree):
         east_loss = loss(weighted_east, weighted_west, mins=[o.low for o in objs], maxs=[o.high for o in objs])
 
         epsilon = 1.0
-        if west_loss < epsilon * east_loss:
-          east_abort = True
-        if east_loss < epsilon * west_loss:
-          west_abort = True
+        # if west_loss < epsilon * east_loss:
+        #   east_abort = True
+        # if east_loss < epsilon * west_loss:
+        #   west_abort = True
 
         self.left = Node(self.problem, afew(wests), self.total_size, parent=self, level=self.level+1, n=little_n)\
           .divide(threshold, abort=west_abort)
@@ -327,8 +363,8 @@ class Node(BinaryTree):
 def _test():
   from problems.zdt.zdt1 import ZDT1
   o = ZDT1()
-  o.populate(100)
-  node = Node(o, Node.format(o.population), 100).divide(sqrt(o.population))
+  population = Node.format(o.populate(100))
+  node = Node(o, population, 100).divide(2*sqrt(population))
   print(node.show())
 
 if __name__ == "__main__":
