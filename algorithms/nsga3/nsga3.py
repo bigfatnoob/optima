@@ -1,6 +1,5 @@
 from __future__ import print_function, division
-import sys
-import os
+import sys, os
 sys.path.append(os.path.abspath("."))
 from utils.lib import *
 from algorithms.algorithm import Algorithm
@@ -9,6 +8,7 @@ import numpy as np
 from copy import deepcopy
 from reference import DIVISIONS, cover
 from configs import nsga3_settings as default_settings
+from measures.igd import igd
 
 __author__ = 'george'
 
@@ -74,10 +74,13 @@ class NSGA3(Algorithm):
     self.population = population
     self.frontiers = []
 
+  def populate(self):
+    return self.problem.populate(self.settings.pop_size)
+
   def run(self):
     start = get_time()
     if not self.population:
-      self.population = self.problem.populate(self.settings.pop_size)
+      self.population = self.populate()
     population = [NSGAPoint(one) for one in self.population]
     self.stat.update(population)
     while self.gen < self.settings.gens:
@@ -86,7 +89,7 @@ class NSGA3(Algorithm):
       population = self.select(population)
       population = self.evolve(population)
       self.stat.update(population)
-      #print(gens, self.IGD(population, self.problem.get_pareto_front()))
+      print(self.gen, igd([one.objectives for one in population], self.problem.get_pareto_front()))
     self.stat.runtime = get_time() - start
     return population
 
@@ -99,15 +102,13 @@ class NSGA3(Algorithm):
     kids = []
     clones = [one.clone() for one in population]
 
-    for _ in range(len(clones)):
-      mom = rand_one(clones)
+    for mom in shuffle(clones):
       dad = None
       while True:
         dad = rand_one(clones)
         if not mom == dad: break
       sis, _ = tools.sbx(self.problem, mom.decisions, dad.decisions)
       sis = tools.poly_mutate(self.problem, sis)
-      #bro = tools.poly_mutate(self.problem, bro)
       kids += [NSGAPoint(sis)]
     return clones + kids
 
@@ -176,6 +177,7 @@ class NSGA3(Algorithm):
     ideal = []
     for i, obj in enumerate(self.problem.objectives):
       f = min if obj.to_minimize else max
+      #ideal.append(f([one.objectives[i] for one in population if self.problem.check_constraints(one.decisions)]))
       ideal.append(f([one.objectives[i] for one in population]))
     return ideal
 
@@ -183,6 +185,7 @@ class NSGA3(Algorithm):
     worst = []
     for i, obj in enumerate(self.problem.objectives):
       f = max if obj.to_minimize else min
+      #worst.append(f([one.objectives[i] for one in population if self.problem.check_constraints(one.decisions)]))
       worst.append(f([one.objectives[i] for one in population]))
     return worst
 
@@ -369,5 +372,5 @@ class NSGA3(Algorithm):
 if __name__ == "__main__":
   from problems.dtlz.dtlz1 import DTLZ1
   o = DTLZ1(3)
-  nsga3 = NSGA3(o, pop_size=91, gens = 10)
+  nsga3 = NSGA3(o, pop_size=92, gens = 400)
   nsga3.run()

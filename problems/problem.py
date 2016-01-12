@@ -75,11 +75,14 @@ class Problem(O):
   def title(self):
     return self.name + "_" + str(len(self.decisions)) + "_" + str(len(self.objectives))
 
-  def generate(self):
+  def generate(self, check_constraints = True):
     while True:
       one = [uniform(d.low, d.high) for d in self.decisions]
-      status = self.evaluate_constraints(one)[0]
-      if status:
+      if check_constraints:
+        status = self.check_constraints(one)
+        if status:
+          return one
+      else:
         return one
 
   def assign(self, decisions):
@@ -102,14 +105,14 @@ class Problem(O):
         weights.append(-1)
     return weights
 
-  def populate(self, n):
+  def populate(self, n, check_constraints=True):
     """
     Default method to create a population
     :param n - Size of population
     """
     population = []
     for _ in range(n):
-      population.append(self.generate())
+      population.append(self.generate(check_constraints))
     return population
 
   def norm(self, one, is_obj = True):
@@ -172,6 +175,9 @@ class Problem(O):
 
   def evaluate_constraints(self, decisions):
     return True, 0
+
+  def check_constraints(self, decisions):
+    return True
 
   def better(self, one, two):
     """

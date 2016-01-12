@@ -146,7 +146,7 @@ def nsga_domination(problem, one, two):
       #Return 2, if 2 satisfies the constraints
       return 2
     # both fail the constraints
-    elif one_offset < two_offset:
+    elif one_offset <= two_offset:
       # one has a lesser offset deviation
       return 1
     else:
