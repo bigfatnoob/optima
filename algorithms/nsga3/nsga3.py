@@ -89,7 +89,7 @@ class NSGA3(Algorithm):
       population = self.select(population)
       population = self.evolve(population)
       self.stat.update(population)
-      print(self.gen, igd([one.objectives for one in population], self.problem.get_pareto_front()))
+      #print(self.gen, igd([one.objectives for one in population], self.problem.get_pareto_front()))
     self.stat.runtime = get_time() - start
     return population
 
@@ -129,6 +129,10 @@ class NSGA3(Algorithm):
     pop_next = []
     for j in range(last_index):
       pop_next += fronts[j]
+    # If the top ranked solution is not satisfied the
+    # entire batch is unsatisfied. Hence reducing unneccesary computation.
+    if not self.problem.check_constraints(s[0].decisions):
+      return s[:self.settings.pop_size]
     s = self.normalize(s)
     references = self.get_references()
     self.associate(s, references)
@@ -177,16 +181,16 @@ class NSGA3(Algorithm):
     ideal = []
     for i, obj in enumerate(self.problem.objectives):
       f = min if obj.to_minimize else max
-      #ideal.append(f([one.objectives[i] for one in population if self.problem.check_constraints(one.decisions)]))
-      ideal.append(f([one.objectives[i] for one in population]))
+      ideal.append(f([one.objectives[i] for one in population if self.problem.check_constraints(one.decisions)]))
+      #ideal.append(f([one.objectives[i] for one in population]))
     return ideal
 
   def get_worst(self, population):
     worst = []
     for i, obj in enumerate(self.problem.objectives):
       f = max if obj.to_minimize else min
-      #worst.append(f([one.objectives[i] for one in population if self.problem.check_constraints(one.decisions)]))
-      worst.append(f([one.objectives[i] for one in population]))
+      worst.append(f([one.objectives[i] for one in population if self.problem.check_constraints(one.decisions)]))
+      #worst.append(f([one.objectives[i] for one in population]))
     return worst
 
   def get_extremes(self, population, ideal):

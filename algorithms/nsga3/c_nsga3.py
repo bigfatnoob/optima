@@ -41,6 +41,14 @@ class C_NSGA3(NSGA3):
 
 if __name__ == "__main__":
   from problems.dtlz.c1_dtlz1 import C1_DTLZ1
+  from problems.dtlz.c1_dtlz3 import C1_DTLZ3
+  from problems.dtlz.c2_dtlz2 import C2_DTLZ2
+  from problems.dtlz.c3_dtlz1 import C3_DTLZ1
+  from problems.dtlz.c3_dtlz4 import C3_DTLZ4
   o = C1_DTLZ1(3)
-  nsga3 = C_NSGA3(o, pop_size=92, gens = 400)
+  #o = C1_DTLZ3(3)
+  #o = C2_DTLZ2(3)
+  #o = C3_DTLZ1(3)
+  #o = C3_DTLZ4(3)
+  nsga3 = C_NSGA3(o, pop_size=92, gens = 750)
   nsga3.run()

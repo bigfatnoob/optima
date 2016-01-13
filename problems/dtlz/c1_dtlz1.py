@@ -1,7 +1,6 @@
 from __future__ import print_function, division
 import sys, os
 sys.path.append(os.path.abspath("."))
-from problems.problem import *
 from dtlz1 import DTLZ1
 
 __author__ = 'george'
