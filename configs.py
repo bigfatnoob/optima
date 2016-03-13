@@ -70,3 +70,16 @@ def moead_settings():
     de_np = 0.9,        # DE neighborhood probability
     de_cr = 0.5         # DE crossover rate
   )
+
+def spea2_settings():
+  """
+  Default SPEA2 settigns
+  :return:
+  """
+  return O(
+    pop_size = 100,
+    archive_size = 100,
+    gens = GENS,
+    sbx_eta = 20,
+    pm_eta = 20
+  )

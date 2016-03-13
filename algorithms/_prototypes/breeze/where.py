@@ -175,6 +175,9 @@ class Node(BinaryTree):
   def get_pop(self):
     return self._pop
 
+  def set_pop(self, pop):
+    self._pop = pop
+
   def fastmap(self, problem, pop):
     if settings().fastmap == "fast":
       return self.fastmap_fast(problem, pop)
@@ -250,7 +253,7 @@ class Node(BinaryTree):
     :param threshold:
     :return:
     """
-    def afew(pop):
+    def a_few(pop):
       clones = [point.clone() for point in pop]
       return clones
 
@@ -258,10 +261,11 @@ class Node(BinaryTree):
     self.n = len(self._pop)
     n = len(self._pop)
 
-    cut, _ = self.binary_chop(self._pop, n//2, None, 2*n ** 0.5, n)
+    #cut, _ = self.binary_chop(self._pop, n//2, None, 2*n ** 0.5, n)
     self.abort = abort
     if not abort and n >= threshold:
       # Splitting
+      cut = n // 2
       wests, easts = self.split(self._pop, cut)
 
       if self.west != self.east:
@@ -277,23 +281,23 @@ class Node(BinaryTree):
         if not self.west.evaluated:
           self.west.evaluate(self.problem)
 
-        weights = self.problem.directional_weights()
-
-        weighted_west = [c*w for c,w in zip(self.west.objectives, weights)]
-        weighted_east = [c*w for c,w in zip(self.east.objectives, weights)]
-        objs = self.problem.objectives
-        west_loss = loss(weighted_west, weighted_east, mins=[o.low for o in objs], maxs=[o.high for o in objs])
-        east_loss = loss(weighted_east, weighted_west, mins=[o.low for o in objs], maxs=[o.high for o in objs])
-
-        epsilon = 1.0
+        # weights = self.problem.directional_weights()
+        #
+        # weighted_west = [c*w for c,w in zip(self.west.objectives, weights)]
+        # weighted_east = [c*w for c,w in zip(self.east.objectives, weights)]
+        # objs = self.problem.objectives
+        # west_loss = loss(weighted_west, weighted_east, mins=[o.low for o in objs], maxs=[o.high for o in objs])
+        # east_loss = loss(weighted_east, weighted_west, mins=[o.low for o in objs], maxs=[o.high for o in objs])
+        #
+        # epsilon = 1.0
         # if west_loss < epsilon * east_loss:
         #   east_abort = True
         # if east_loss < epsilon * west_loss:
         #   west_abort = True
 
-        self.left = Node(self.problem, afew(wests), self.total_size, parent=self, level=self.level+1, n=little_n)\
+        self.left = Node(self.problem, a_few(wests), self.total_size, parent=self, level=self.level+1, n=little_n)\
           .divide(threshold, abort=west_abort)
-        self.right = Node(self.problem, afew(easts), self.total_size, parent=self, level=self.level+1, n=little_n)\
+        self.right = Node(self.problem, a_few(easts), self.total_size, parent=self, level=self.level+1, n=little_n)\
           .divide(threshold, abort=east_abort)
     return self
 

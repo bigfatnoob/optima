@@ -8,18 +8,6 @@ from algorithms.algorithm import Algorithm
 import utils.tools as tools
 from configs import nsga2_settings as default_settings
 
-def loo(points):
-  """
-  Iterator which generates a
-  test case and training set
-  :param points:
-  :return:
-  """
-  for i in range(len(points)):
-    one = points[i]
-    rest = points[:i] + points[i+1:]
-    yield one, rest
-
 
 class NSGAPoint(Point):
 

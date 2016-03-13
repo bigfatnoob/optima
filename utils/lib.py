@@ -2,7 +2,6 @@ from __future__ import division, print_function
 import sys, os
 sys.path.append(os.path.abspath("."))
 import random
-import sys
 import math
 import time
 import json
@@ -286,8 +285,10 @@ class Point(O):
     self.decisions = decisions[:]
     if problem:
       self.objectives = problem.evaluate(decisions)
+      self.norm_objectives = problem.norm(self.objectives)
     else:
       self.objectives = []
+      self.norm_objectives = []
 
   def clone(self):
     """
@@ -296,6 +297,7 @@ class Point(O):
     """
     new = Point(self.decisions)
     new.objectives = self.objectives[:]
+    new.norm_objectives = self.norm_objectives[:]
     return new
 
   def evaluate(self, problem, stat = None, gen = None):
@@ -305,6 +307,7 @@ class Point(O):
     """
     if not self.objectives:
       self.objectives = problem.evaluate(self.decisions)
+      self.norm_objectives = problem.norm(self.objectives)
       if stat:
         stat.evals+=1
         if gen is not None:
@@ -380,3 +383,15 @@ def mean_iqr(lst):
   mean = np.mean(lst)
   q75, q25 = np.percentile(lst, [75, 25])
   return mean, q75 - q25
+
+def loo(points):
+  """
+  Iterator which generates a
+  test case and training set
+  :param points:
+  :return:
+  """
+  for i in range(len(points)):
+    one = points[i]
+    rest = points[:i] + points[i+1:]
+    yield one, rest
