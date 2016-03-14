@@ -73,7 +73,7 @@ def moead_settings():
 
 def spea2_settings():
   """
-  Default SPEA2 settigns
+  Default SPEA2 settings
   :return:
   """
   return O(
